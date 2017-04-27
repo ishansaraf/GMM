@@ -25,53 +25,38 @@ import javax.swing.JTextField;
 public class Main {
 	
 	static String MerchantID;
-	static Queue<String> updateQueue = new LinkedList<>();
+	static Queue<String> updateQueue;
 	static JPanel northPanel;
-	static GMMPage marketPage;
 	static GMMPage curPage;
+	static boolean relaunch;
+	static JFrame mainframe;
+	protected static MarketPage marketPage;
 	
 	public static void main(String[] args) {
-		//login
-		login();
-		
-		//construct north panel
-		northPanel = new JPanel();
-		northPanel.setBackground(Color.GRAY);
-		northPanel.setPreferredSize(new Dimension(900, 30));
-		
-		//set up frame
-		JFrame frame = new JFrame();
-		frame.setSize(900, 600);
-		frame.setTitle("GMM Marketing Solutions");
-		frame.setResizable(false);
-		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		frame.add(northPanel, BorderLayout.NORTH);
-		
-		//construct pages
-		marketPage = new MarketPage(MerchantID, frame);
-		
-		//add northPanel menu buttons
-		JButton marketPageButton = new JButton("Market View");
-		marketPageButton.addActionListener(new MenuListener(marketPage));
-		
-		//add things to northPanel
-		northPanel.add(marketPageButton);
-		
-		//show market page on startup
-		marketPage.changeToPage();
-		curPage = marketPage;
-		
-		//center and show the window
-		frame.setLocationRelativeTo(null);
-		frame.setVisible(true);
+		relaunch = true;
+		while(true) {
+			if (relaunch) {
+				mainframe = new JFrame();
+				mainframe.setSize(900, 600);
+				mainframe.setTitle("GMM Marketing Solutions");
+				mainframe.setResizable(false);
+				mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				login();
+				relaunch = false;
+			}
+			try {
+				Thread.sleep(1000);
+			} catch (InterruptedException exception) {
+				exception.printStackTrace();
+			}
+		}
 	}
 	
 	/**
 	 * login prompt, sets MerchantID TODO from server query
 	 *
 	 */
-	private static void login() {
-	
+	static void login() {
 		//set up frame
 		JFrame frame = new JFrame("GMM Marketing Solutions");
 		frame.setSize(300, 150);
@@ -118,8 +103,42 @@ public class Main {
 			}
 		}
 		frame.dispose();
+		
+		runProgram();
 	}
 	
+	static void runProgram() {
+		updateQueue = new LinkedList<>();
+		
+		//construct north panel
+		northPanel = new JPanel();
+		northPanel.setBackground(Color.GRAY);
+		northPanel.setPreferredSize(new Dimension(900, 30));
+		mainframe.add(northPanel, BorderLayout.NORTH);
+		
+		//construct pages
+		marketPage = new MarketPage(MerchantID);
+		
+		//add northPanel menu buttons
+		JButton marketPageButton = new JButton("Market View");
+		marketPageButton.addActionListener(new MenuListener(marketPage));
+		
+		JButton logOutButton = new JButton("Log Out");
+		logOutButton.addActionListener(new LogOutListener());
+		
+		//add things to northPanel
+		northPanel.add(marketPageButton);
+		northPanel.add(logOutButton);
+		
+		//show market page on startup
+		marketPage.changeToPage();
+		curPage = marketPage;
+		
+		//center and show the window
+		mainframe.setLocationRelativeTo(null);
+		mainframe.setVisible(true);
+	}
+
 	/**
 	 *  TODO gets a list of shops owned by the Merchant using query
 	 *
@@ -134,5 +153,18 @@ public class Main {
 		return dummyList;
 		//DEBUG CODE END
 	}
-
+	
+	
+	public static class LogOutListener implements ActionListener {
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			Main.marketPage.shutDown();
+			Main.mainframe.dispose();
+			Main.MerchantID = null;
+			Main.updateQueue = null;
+			Main.northPanel = null;
+			Main.curPage = null;
+			Main.relaunch = true;
+		}
+	}
 }

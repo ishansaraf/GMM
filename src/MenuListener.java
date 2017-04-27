@@ -11,10 +11,8 @@ public class MenuListener implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
-		if (Main.curPage != this.page) {
-			this.page.changeToPage();
-			Main.curPage = this.page;
-		}
+		this.page.changeToPage();
+		Main.curPage = this.page;
 	}
 
 }

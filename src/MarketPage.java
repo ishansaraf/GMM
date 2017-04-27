@@ -4,7 +4,6 @@ import java.awt.Dimension;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -20,11 +19,13 @@ public class MarketPage implements GMMPage{
 	DefaultListModel<String> shopListModel;
 	JList<String> shopList;
 	JScrollPane shopScrollList;
-	JFrame frame;
+	Thread dataUpdater;
+	Thread gameThread;
+	private Updater updater;
+	private GameHandler gameHandler;
 	
-	public MarketPage(String MerchantID, JFrame frame) {
+	public MarketPage(String MerchantID) {
 		this.MerchantID = MerchantID;
-		this.frame = frame;
 		
 		//create panels
 		this.eastPanel = new JPanel();
@@ -64,20 +65,36 @@ public class MarketPage implements GMMPage{
 	
 	@Override
 	public void changeToPage() {
-		//add all elements into the frame
-		this.frame.add(this.eastPanel, BorderLayout.EAST);
-		this.frame.add(this.shopScrollList, BorderLayout.WEST);
-		this.frame.add(this.updateScrollFeed, BorderLayout.SOUTH);
+		if (Main.curPage != this) {
+			Main.mainframe.add(this.eastPanel, BorderLayout.EAST);
+			Main.mainframe.add(this.shopScrollList, BorderLayout.WEST);
+			Main.mainframe.add(this.updateScrollFeed, BorderLayout.SOUTH);
+			System.out.println("MarketPage Loaded");	
+		}
 	}
 	
 	private void kickOffUpdateThreads() {
 		//kick off a thread for processing updates
-		Thread dataUpdater = new Thread(new Updater(this.frame, this.updateListModel, this.updateFeed));
-		dataUpdater.start();
+		this.updater = new Updater(this.updateListModel, this.updateFeed);
+		this.dataUpdater = new Thread(this.updater);
+		this.dataUpdater.start();
 		
 		//kick off a thread for collecting updates from the MMORPG
-		Thread gameThread = new Thread(new GameHandler(this.MerchantID));
-		gameThread.start();
+		this.gameHandler = new GameHandler(this.MerchantID);
+		this.gameThread = new Thread(this.gameHandler);
+		this.gameThread.start();
+	}
+	
+	@Override
+	public void shutDown() {
+		this.updater.shutDown();
+		this.gameHandler.shutDown();
+		try {
+			this.dataUpdater.join();
+			this.gameThread.join();
+		} catch (InterruptedException exception) {
+			exception.printStackTrace();
+		}
 	}
 	
 }

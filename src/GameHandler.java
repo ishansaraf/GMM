@@ -15,15 +15,17 @@ public class GameHandler implements Runnable {
 
 	private String MerchantID;
 	private Game game;
+	private boolean shutDown;
 	
 	public GameHandler(String MerchantID) {
 		this.MerchantID = MerchantID;
 		this.game = new Game();
+		this.shutDown = false;
 	}
 	
 	@Override
 	public void run() {
-		while(true) {
+		while(!this.shutDown) {
 			pollforUpdates();
 			updateShops();
 			try {
@@ -102,5 +104,9 @@ public class GameHandler implements Runnable {
 		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
 		if (Math.random() < 0.1) Main.updateQueue.add(timeStamp + " Restocked the Shop: " + ShopID);
 		//DEBUG CODE END
+	}
+
+	public void shutDown() {
+		this.shutDown = true;
 	}
 }

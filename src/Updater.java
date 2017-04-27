@@ -1,5 +1,4 @@
 import javax.swing.DefaultListModel;
-import javax.swing.JFrame;
 import javax.swing.JList;
 
 /**
@@ -11,26 +10,26 @@ import javax.swing.JList;
 public class Updater implements Runnable {
 	
 	static final int INTERVAL_MS = 200;
-	private JFrame frame;
 	private DefaultListModel<String> updateModel;
 	private JList<String> updateFeed;
+	private boolean shutDown;
 	
-	public Updater(JFrame frame, DefaultListModel<String> updateModel, JList<String> updateFeed) {
-		this.frame = frame;
+	public Updater(DefaultListModel<String> updateModel, JList<String> updateFeed) {
 		this.updateModel = updateModel;
 		this.updateFeed = updateFeed;
+		this.shutDown = false;
 	}
 	
 	@Override
 	public void run() {
-		while(true) {
+		while(!this.shutDown) {
 			if (Main.updateQueue.peek() != null) { 
 				this.updateModel.addElement(Main.updateQueue.poll());
 				int curIndex = (this.updateModel.size()-1);
 				if (curIndex <= this.updateFeed.getLastVisibleIndex() + 1 && curIndex >= this.updateFeed.getFirstVisibleIndex()){
 					this.updateFeed.ensureIndexIsVisible(curIndex);
 				}
-				this.frame.repaint();
+				Main.mainframe.repaint();
 			}
 			try {
 				Thread.sleep(INTERVAL_MS);
@@ -38,6 +37,10 @@ public class Updater implements Runnable {
 				exception.printStackTrace();
 			}
 		}
+	}
+
+	public void shutDown() {
+		this.shutDown = true;
 	}
 
 }
