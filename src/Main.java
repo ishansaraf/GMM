@@ -1,13 +1,20 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
+import javax.imageio.ImageIO;
+import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -24,13 +31,20 @@ import javax.swing.JTextField;
  */
 public class Main {
 	
+	public static final Color BG_COLOR = new Color(100, 100, 200);
+	public static final Color FIELD_COLOR = new Color(150, 150, 250);
+	public static final Color MENU_BUTTON_COLOR = new Color(50, 50, 150);
+	public static final JLabel EMPTY_CELL = new JLabel();
+	public static final Font HEADER_FONT = new Font(null, Font.BOLD, 24);
+	public static final Font FIELD_FONT = new Font(Font.MONOSPACED, Font.BOLD, 18);
+	
 	static String MerchantID;
 	static Queue<String> updateQueue;
-	static JPanel northPanel;
+	static JPanel menuBar;
 	static GMMPage curPage;
 	static boolean relaunch;
 	static JFrame mainframe;
-	protected static MarketPage marketPage;
+	protected static GMMPage marketPage;
 	
 	public static void main(String[] args) {
 		relaunch = true;
@@ -53,48 +67,76 @@ public class Main {
 	}
 	
 	/**
-	 * login prompt, sets MerchantID TODO from server query
+	 * login prompt
 	 *
 	 */
 	static void login() {
 		//set up frame
 		JFrame frame = new JFrame("GMM Marketing Solutions");
-		frame.setSize(300, 150);
+		frame.setSize(600, 360);
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-		JLabel UsernameLabel = new JLabel("Username:");
-		JTextField UsernameField = new JTextField(15);
+		//load logo image
+		BufferedImage logoImg = null;
+		try {
+			logoImg = ImageIO.read(new File("logo.png"));
+		} catch (IOException exception1) {
+			exception1.printStackTrace();
+		}
+		
+		//create panels
 		JPanel UsernamePanel = new JPanel();
-		UsernamePanel.add(UsernameLabel, BorderLayout.CENTER);
-		UsernamePanel.add(UsernameField, BorderLayout.SOUTH);
-		
-		JLabel PasswordLabel = new JLabel("Password:");
-		JPasswordField PasswordField = new JPasswordField(15);
-		PasswordField.setEchoChar('*');
 		JPanel PasswordPanel = new JPanel();
-		PasswordPanel.add(PasswordLabel, BorderLayout.CENTER);
-		PasswordPanel.add(PasswordField, BorderLayout.SOUTH);
+		JPanel CredentialPanel = new JPanel();
+		JPanel LoginPanel = new JPanel();
 		
-		JButton LoginButton = new JButton("Login");
-		LoginButton.addActionListener(new ActionListener() {
-			
-			@Override
-			public void actionPerformed(ActionEvent arg0) {
-				//TODO queries the Merchant Table for the Username and Password
-				//	if it finds an entry, sets the MerchantID
-				MerchantID = "";
-			}
-		});
+		//create labels
+		JLabel logoImgLabel = new JLabel(new ImageIcon(logoImg));
+		JLabel UsernameLabel = new JLabel("Username:");
+		JLabel PasswordLabel = new JLabel("Password:");
 		
-		frame.add(UsernamePanel, BorderLayout.NORTH);
-		frame.add(PasswordPanel, BorderLayout.CENTER);
-		frame.add(LoginButton, BorderLayout.SOUTH);
+		//create fields
+		JTextField UsernameField = new JTextField(15);
+		JPasswordField PasswordField = new JPasswordField(15);
+		
+		//misc construct & settings
+		JButton LoginButton = new MenuButton("Login", new LoginListener());
+		GridLayout fieldLayout = new GridLayout(2, 3);
+		PasswordField.setEchoChar('*');
+		CredentialPanel.setLayout(fieldLayout);
+		
+		//set Fonts
+		UsernameLabel.setFont(FIELD_FONT);
+		PasswordLabel.setFont(FIELD_FONT);
+		UsernameField.setFont(FIELD_FONT);
+		PasswordField.setFont(FIELD_FONT);
+		LoginButton.setFont(FIELD_FONT);
+		
+		//add to panels
+		UsernamePanel.add(UsernameLabel);
+		UsernamePanel.add(UsernameField);
+		PasswordPanel.add(PasswordLabel);
+		PasswordPanel.add(PasswordField);
+		CredentialPanel.add(UsernamePanel);
+		CredentialPanel.add(PasswordPanel);
+		LoginPanel.add(LoginButton);
+		
+		//setting backgrounds
+		UsernamePanel.setBackground(BG_COLOR);
+		PasswordPanel.setBackground(BG_COLOR);
+		LoginPanel.setBackground(BG_COLOR);
+		
+		//add to frame
+		frame.add(logoImgLabel, BorderLayout.NORTH);
+		frame.add(CredentialPanel, BorderLayout.CENTER);
+		frame.add(LoginPanel, BorderLayout.SOUTH);
 		
 		//center and show the window
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
 		
+		//wait for verification
 		while(MerchantID == null) {
 			try {
 				Thread.sleep(1000);
@@ -110,29 +152,35 @@ public class Main {
 	static void runProgram() {
 		updateQueue = new LinkedList<>();
 		
-		//construct north panel
-		northPanel = new JPanel();
-		northPanel.setBackground(Color.GRAY);
-		northPanel.setPreferredSize(new Dimension(900, 30));
-		mainframe.add(northPanel, BorderLayout.NORTH);
+		//construct menuBar
+		menuBar = new JPanel();
+		menuBar.setLayout(new GridLayout(0,5));
+		menuBar.setBackground(Color.GRAY);
+		menuBar.setPreferredSize(new Dimension(900, 30));
+		mainframe.add(menuBar, BorderLayout.NORTH);
 		
 		//construct pages
-		marketPage = new MarketPage(MerchantID);
+		marketPage = new MarketPage();
+		GMMPage addShopPage = new ShopAddPage();
+		GMMPage addSupplierPage = new SupplierAddPage();
+		GMMPage restockPage = new RestockPage();
 		
-		//add northPanel menu buttons
-		JButton marketPageButton = new JButton("Market View");
-		marketPageButton.addActionListener(new MenuListener(marketPage));
+		//construct menu buttons
+		JButton marketPageButton = new MenuButton("Market View", new MenuListener(marketPage));
+		JButton addShopPageButton = new MenuButton("Add New Shop", new MenuListener(addShopPage));
+		JButton addSupplierPageButton = new MenuButton("Add New Supplier", new MenuListener(addSupplierPage));
+		JButton restockPageButton = new MenuButton("Inform of Shop Restock", new MenuListener(restockPage));
+		JButton logOutButton = new MenuButton("Log Out", new LogOutListener());
 		
-		JButton logOutButton = new JButton("Log Out");
-		logOutButton.addActionListener(new LogOutListener());
-		
-		//add things to northPanel
-		northPanel.add(marketPageButton);
-		northPanel.add(logOutButton);
+		//add menu buttons to menuBar
+		menuBar.add(marketPageButton);
+		menuBar.add(addShopPageButton);
+		menuBar.add(addSupplierPageButton);
+		menuBar.add(restockPageButton);
+		menuBar.add(logOutButton);
 		
 		//show market page on startup
 		marketPage.changeToPage();
-		curPage = marketPage;
 		
 		//center and show the window
 		mainframe.setLocationRelativeTo(null);
@@ -155,14 +203,14 @@ public class Main {
 	}
 	
 	
-	public static class LogOutListener implements ActionListener {
+	private static class LogOutListener implements ActionListener {
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			Main.marketPage.shutDown();
 			Main.mainframe.dispose();
 			Main.MerchantID = null;
 			Main.updateQueue = null;
-			Main.northPanel = null;
+			Main.menuBar = null;
 			Main.curPage = null;
 			Main.relaunch = true;
 		}

@@ -11,7 +11,6 @@ import javax.swing.ScrollPaneConstants;
 
 public class MarketPage implements GMMPage{
 
-	String MerchantID;
 	JPanel eastPanel;
 	DefaultListModel<String> updateListModel;
 	JList<String> updateFeed;
@@ -23,15 +22,16 @@ public class MarketPage implements GMMPage{
 	Thread gameThread;
 	private Updater updater;
 	private GameHandler gameHandler;
+	boolean atBottomOnUnshow;
 	
-	public MarketPage(String MerchantID) {
-		this.MerchantID = MerchantID;
+	public MarketPage() {
+		this.atBottomOnUnshow = false;
 		
 		//create panels
 		this.eastPanel = new JPanel();
 		
 		//set BG colors
-		this.eastPanel.setBackground(Color.lightGray);
+		this.eastPanel.setBackground(Main.BG_COLOR);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		//create the updateFeed Listbox for displaying updates
@@ -66,10 +66,15 @@ public class MarketPage implements GMMPage{
 	@Override
 	public void changeToPage() {
 		if (Main.curPage != this) {
+			if (Main.curPage != null) Main.curPage.unShow();
 			Main.mainframe.add(this.eastPanel, BorderLayout.EAST);
 			Main.mainframe.add(this.shopScrollList, BorderLayout.WEST);
 			Main.mainframe.add(this.updateScrollFeed, BorderLayout.SOUTH);
-			System.out.println("MarketPage Loaded");	
+			Main.curPage = this;
+			Main.mainframe.revalidate();
+			Main.mainframe.repaint();
+			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
+			System.out.println("MarketPage Loaded");
 		}
 	}
 	
@@ -80,7 +85,7 @@ public class MarketPage implements GMMPage{
 		this.dataUpdater.start();
 		
 		//kick off a thread for collecting updates from the MMORPG
-		this.gameHandler = new GameHandler(this.MerchantID);
+		this.gameHandler = new GameHandler(Main.MerchantID);
 		this.gameThread = new Thread(this.gameHandler);
 		this.gameThread.start();
 	}
@@ -95,6 +100,16 @@ public class MarketPage implements GMMPage{
 		} catch (InterruptedException exception) {
 			exception.printStackTrace();
 		}
+	}
+
+	@Override
+	public void unShow() {
+		if (this.updateFeed.getLastVisibleIndex() == this.updateListModel.size()-1) this.atBottomOnUnshow = true;
+		else this.atBottomOnUnshow = false;
+		if (this.eastPanel != null) Main.mainframe.remove(this.eastPanel);
+		if (this.shopScrollList != null) Main.mainframe.remove(this.shopScrollList);
+		if (this.updateScrollFeed != null) Main.mainframe.remove(this.updateScrollFeed);
+		System.out.println("MarketPage Unloaded");
 	}
 	
 }

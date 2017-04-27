@@ -11,8 +11,8 @@ public class MenuListener implements ActionListener {
 	
 	@Override
 	public void actionPerformed(ActionEvent arg0) {
+//		if (Main.curPage == null) System.out.println("null");
 		this.page.changeToPage();
-		Main.curPage = this.page;
 	}
 
 }
