@@ -8,17 +8,12 @@ import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
 
-import javax.swing.BorderFactory;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
-import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 
 /**
  * 
@@ -31,10 +26,18 @@ public class Main {
 	
 	static String MerchantID;
 	static Queue<String> updateQueue = new LinkedList<>();
+	static JPanel northPanel;
+	static GMMPage marketPage;
+	static GMMPage curPage;
 	
 	public static void main(String[] args) {
 		//login
 		login();
+		
+		//construct north panel
+		northPanel = new JPanel();
+		northPanel.setBackground(Color.GRAY);
+		northPanel.setPreferredSize(new Dimension(900, 30));
 		
 		//set up frame
 		JFrame frame = new JFrame();
@@ -42,75 +45,25 @@ public class Main {
 		frame.setTitle("GMM Marketing Solutions");
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-		
-		//create panels
-		JPanel northPanel = new JPanel();
-		JPanel eastPanel = new JPanel();
-		
-		//set BG colors
-		northPanel.setBackground(Color.GRAY);
-		eastPanel.setBackground(Color.lightGray);
-		eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		
-		//create the updateFeed Listbox for displaying updates
-		DefaultListModel<String> updateListModel = new DefaultListModel<>();
-		JList<String>updateFeed = new JList<>(updateListModel);
-		updateListModel.addElement("initilaized update feed!");
-		
-		//put the update feed into a JScrollPane for scrolling
-		JScrollPane updateScrollFeed = new JScrollPane(updateFeed);
-		updateScrollFeed.setViewportView(updateFeed);
-		updateScrollFeed.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		
-		//create the shopList Listbox for displaying updates
-		DefaultListModel<String> shopListModel = new DefaultListModel<>();
-		JList<String>shopList = new JList<>(shopListModel);
-		for (String ShopID : getShopList()) {
-			shopListModel.addElement(ShopID);
-		}
-		
-		//put the shopList into a JScrollPane for scrolling
-		JScrollPane shopScrollList = new JScrollPane(shopList);
-		shopScrollList.setViewportView(shopList);
-		shopScrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		
-		//set prefererred sizes
-		northPanel.setPreferredSize(new Dimension(900, 30));
-		eastPanel.setPreferredSize(new Dimension(600, 0));
-		shopScrollList.setPreferredSize(new Dimension(295, 0));
-		
-		//add all elements into the frame
 		frame.add(northPanel, BorderLayout.NORTH);
-		frame.add(eastPanel, BorderLayout.EAST);
-		frame.add(shopScrollList, BorderLayout.WEST);
-		frame.add(updateScrollFeed, BorderLayout.SOUTH);
+		
+		//construct pages
+		marketPage = new MarketPage(MerchantID, frame);
+		
+		//add northPanel menu buttons
+		JButton marketPageButton = new JButton("Market View");
+		marketPageButton.addActionListener(new MenuListener(marketPage));
+		
+		//add things to northPanel
+		northPanel.add(marketPageButton);
+		
+		//show market page on startup
+		marketPage.changeToPage();
+		curPage = marketPage;
 		
 		//center and show the window
 		frame.setLocationRelativeTo(null);
 		frame.setVisible(true);
-		
-		//kick off a thread for processing updates
-		Thread dataUpdater = new Thread(new Updater(frame, updateListModel, updateFeed));
-		dataUpdater.start();
-		
-		//kick off a thread for collecting updates from the MMORPG
-		Thread gameThread = new Thread(new GameHandler(MerchantID));
-		gameThread.start();
-	}
-	
-	/**
-	 *  TODO gets a list of shops owned by the Merchant using query
-	 *
-	 * @return List<String>
-	 */
-	public static List<String> getShopList() {
-		//DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 30; i++) {
-			dummyList.add("Shop" + i);
-		}
-		return dummyList;
-		//DEBUG CODE END
 	}
 	
 	/**
@@ -165,6 +118,21 @@ public class Main {
 			}
 		}
 		frame.dispose();
+	}
+	
+	/**
+	 *  TODO gets a list of shops owned by the Merchant using query
+	 *
+	 * @return List<String>
+	 */
+	public static List<String> getShopList() {
+		//DEBUG CODE START
+		List<String> dummyList = new ArrayList<>();
+		for (int i = 1; i <= 30; i++) {
+			dummyList.add("Shop" + i);
+		}
+		return dummyList;
+		//DEBUG CODE END
 	}
 
 }
