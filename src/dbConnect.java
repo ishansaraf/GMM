@@ -18,15 +18,15 @@ public class dbConnect {
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
 			Connection conn = DriverManager.getConnection(connectionURL);
-
-			Statement test = conn.createStatement();
-			String testQuery = "SELECT * FROM Item";
-			ResultSet rs = test.executeQuery(testQuery);
-			while (rs.next()) {
-				System.out.println(rs.getString("Name"));
-				System.out.println(rs.getString("Description"));
-				System.out.println(rs.getString("BaseValue"));
-			}
+//			FOR DEBUG PURPOSES
+//			Statement test = conn.createStatement();
+//			String testQuery = "SELECT * FROM Item";
+//			ResultSet rs = test.executeQuery(testQuery);
+//			while (rs.next()) {
+//				System.out.println(rs.getString("Name"));
+//				System.out.println(rs.getString("Description"));
+//				System.out.println(rs.getString("BaseValue"));
+//			}
 			
 			return conn;
 		} catch (Exception e) {
