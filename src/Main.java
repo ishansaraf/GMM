@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -24,6 +23,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
+import javax.swing.text.AbstractDocument;
 
 /**
  * 
@@ -107,6 +107,9 @@ public class Main {
 		// create fields
 		JTextField UsernameField = new JTextField(15);
 		JPasswordField PasswordField = new JPasswordField(15);
+		
+		//limit fields
+		((AbstractDocument)UsernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 
 		// misc construct & settings
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));

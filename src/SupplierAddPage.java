@@ -12,6 +12,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.text.AbstractDocument;
 
 public class SupplierAddPage implements GMMPage {
 
@@ -44,7 +45,7 @@ public class SupplierAddPage implements GMMPage {
 		//create Labels
 		JLabel nameLabel = new JLabel("*Name: ");
 		JLabel serverLabel = new JLabel("*Server: ");
-		JLabel locationLabelX = new JLabel("*Location:       x=");
+		JLabel locationLabelX = new JLabel("*Location: x=");
 		JLabel locationLabelY = new JLabel(" y=");
 		JLabel discountLabel = new JLabel(" Product Discount: ");
 		JLabel afterDiscountLabel = new JLabel("%          ");
@@ -52,9 +53,15 @@ public class SupplierAddPage implements GMMPage {
 		//create TextFields
 		this.name = new JTextField(26);
 		this.server = new JComboBox<>();
-		this.locationX = new JTextField(5);
-		this.locationY = new JTextField(5);
-		this.discount = new JTextField(3);
+		this.locationX = new JTextField(8);
+		this.locationY = new JTextField(8);
+		this.discount = new JTextField(2);
+		
+		//limit fields
+		((AbstractDocument)this.name.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
+		((AbstractDocument)this.locationX.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument)this.locationY.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument)this.discount.getDocument()).setDocumentFilter(new LimitDocumentFilter(2));
 		
 		//create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());

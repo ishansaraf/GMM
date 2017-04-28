@@ -15,6 +15,7 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
+import javax.swing.text.AbstractDocument;
 
 public class ShopAddPage implements GMMPage {
 	// Fields for GUI
@@ -35,7 +36,7 @@ public class ShopAddPage implements GMMPage {
 				double lX = Double.parseDouble(locationX.getText());
 				double lY = Double.parseDouble(locationY.getText());
 				double funding = funds.getText().equals("") ? 0.00 : Double.parseDouble(funds.getText());
-
+				System.out.println(funding);
 				addShop(name.getText(), (String) server.getSelectedItem(), lX, lY, funding);
 			}
 		}
@@ -53,16 +54,22 @@ public class ShopAddPage implements GMMPage {
 		// create Labels
 		JLabel nameLabel = new JLabel("*Name: ");
 		JLabel serverLabel = new JLabel("*Server: ");
-		JLabel locationLabelX = new JLabel("*Location:       x=");
+		JLabel locationLabelX = new JLabel("*Location: x=");
 		JLabel locationLabelY = new JLabel(" y=");
-		JLabel fundsLabel = new JLabel(" Current Funds: ");
+		JLabel fundsLabel = new JLabel(" Current Funds:    ");
 
 		// create Fields
 		this.name = new JTextField(26);
 		this.server = new JComboBox<>();
-		this.locationX = new JTextField(5);
-		this.locationY = new JTextField(5);
-		this.funds = new JTextField(17);
+		this.locationX = new JTextField(8);
+		this.locationY = new JTextField(8);
+		this.funds = new JTextField(14);
+		
+		//limit fields
+		((AbstractDocument)this.name.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
+		((AbstractDocument)this.locationX.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument)this.locationY.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument)this.funds.getDocument()).setDocumentFilter(new LimitDocumentFilter(14));
 
 		// create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());
@@ -172,12 +179,19 @@ public class ShopAddPage implements GMMPage {
 
 			// Checking that addition of store front returned successfully
 			if (returnVal == 1)
-				System.out.println(
+				JOptionPane.showMessageDialog(null, 
 						"Storefront already exists in the database. Please input new parameters and try again.");
-			else if (returnVal == 0)
-				System.out.println("Store " + name + " was successfully added!");
+			else if (returnVal == 0) {
+				JOptionPane.showMessageDialog(null, "Store " + name + " was successfully added!");
+				//blank out fields after success
+				this.name.setText("");
+				this.server.setSelectedIndex(0);
+				this.locationX.setText("");
+				this.locationY.setText("");
+				this.funds.setText("");
+			}
 			else
-				System.out.println("Storefront addition failed. Error code is: " + returnVal);
+				JOptionPane.showMessageDialog(null, "Storefront addition failed. Error code is: " + returnVal);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
