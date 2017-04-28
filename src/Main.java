@@ -220,4 +220,24 @@ public class Main {
 			Main.relaunch = true;
 		}
 	}
+
+	public static List<String> getServerList() {
+		// DEBUG CODE START
+		List<String> dummyList = new ArrayList<>();
+		for (int i = 1; i <= 7; i++) {
+			dummyList.add("Server" + i);
+		}
+		return dummyList;
+		// DEBUG CODE END
+	}
+
+	public static List<String> getSupplierList() {
+		// DEBUG CODE START
+		List<String> dummyList = new ArrayList<>();
+		for (int i = 1; i <= 17; i++) {
+			dummyList.add("Supplier" + i);
+		}
+		return dummyList;
+		// DEBUG CODE END
+	}
 }

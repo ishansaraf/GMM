@@ -2,8 +2,12 @@ import java.awt.BorderLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.List;
 
+import javax.swing.ComboBoxModel;
+import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
@@ -23,7 +27,7 @@ public class SupplierAddPage implements GMMPage {
 
 	JPanel centerPanel;
 	JTextField name;
-	JTextField server;
+	JComboBox<String> server;
 	JTextField locationX;
 	JTextField locationY;
 	JTextField discount;
@@ -47,13 +51,23 @@ public class SupplierAddPage implements GMMPage {
 		
 		//create TextFields
 		this.name = new JTextField(26);
-		this.server = new JTextField(24);
+		this.server = new JComboBox<>();
 		this.locationX = new JTextField(5);
 		this.locationY = new JTextField(5);
 		this.discount = new JTextField(3);
 		
 		//create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());
+		
+		//populate ComboBoxes
+		List<String> tempArrList = Main.getServerList();
+		String[] modelArray = new String[tempArrList.size()+1];
+		modelArray[0] = "                      ";
+		for (int i = 0; i < modelArray.length-1; i++) {
+			modelArray[i+1] = tempArrList.get(i);
+		}
+		ComboBoxModel<String> serverModel = new DefaultComboBoxModel<>(modelArray);
+		this.server.setModel(serverModel);
 		
 		//set fonts
 		nameLabel.setFont(Main.FIELD_FONT);
