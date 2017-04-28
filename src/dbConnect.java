@@ -7,17 +7,18 @@ public class dbConnect {
 
 	@SuppressWarnings("resource")
 	public Connection connect() {
+		Connection conn = null;
 		try {
 			String serverURL = "jdbc:sqlserver://golem.csse.rose-hulman.edu";
 			// TODO: Figure out how to encrypt config file to ensure user+pwd
 			// data isn't visible in plaintext
 			String username = "gmm";
 			String pwd = "333project";
-			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd;
+			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd + ";databaseName=GMM";
 
-			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
+			//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
-			Connection conn = DriverManager.getConnection(connectionURL);
+			conn = DriverManager.getConnection(connectionURL);
 //			FOR DEBUG PURPOSES
 //			Statement test = conn.createStatement();
 //			String testQuery = "SELECT * FROM Item";
@@ -27,13 +28,9 @@ public class dbConnect {
 //				System.out.println(rs.getString("Description"));
 //				System.out.println(rs.getString("BaseValue"));
 //			}
-			
-			return conn;
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		finally {
-			return null;
-		}
+		return conn;
 	}
 }
