@@ -7,6 +7,7 @@ public class dbConnect {
 
 	@SuppressWarnings("resource")
 	public Connection connect() {
+		Connection conn = null;
 		try {
 			String serverURL = "jdbc:sqlserver://golem.csse.rose-hulman.edu";
 			// TODO: Figure out how to encrypt config file to ensure user+pwd
@@ -17,23 +18,19 @@ public class dbConnect {
 
 			Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
 
-			Connection conn = DriverManager.getConnection(connectionURL);
-//			FOR DEBUG PURPOSES
-//			Statement test = conn.createStatement();
-//			String testQuery = "SELECT * FROM Item";
-//			ResultSet rs = test.executeQuery(testQuery);
-//			while (rs.next()) {
-//				System.out.println(rs.getString("Name"));
-//				System.out.println(rs.getString("Description"));
-//				System.out.println(rs.getString("BaseValue"));
-//			}
-			
-			return conn;
+			conn = DriverManager.getConnection(connectionURL);
+			// FOR DEBUG PURPOSES
+			// Statement test = conn.createStatement();
+			// String testQuery = "SELECT * FROM Item";
+			// ResultSet rs = test.executeQuery(testQuery);
+			// while (rs.next()) {
+			// System.out.println(rs.getString("Name"));
+			// System.out.println(rs.getString("Description"));
+			// System.out.println(rs.getString("BaseValue"));
+			// }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
-		finally {
-			return null;
-		}
+		return conn;
 	}
 }
