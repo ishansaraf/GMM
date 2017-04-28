@@ -107,7 +107,7 @@ public class Main {
 		JPasswordField PasswordField = new JPasswordField(15);
 
 		// misc construct & settings
-		JButton LoginButton = new MenuButton("Login", new LoginListener());
+		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
 		CredentialPanel.setLayout(fieldLayout);
