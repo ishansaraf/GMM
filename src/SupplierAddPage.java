@@ -1,12 +1,25 @@
 import java.awt.BorderLayout;
 import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
+import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 
 public class SupplierAddPage implements GMMPage {
+
+	public class SubmitListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// TODO Auto-generated method stub.
+
+		}
+
+	}
 
 	JPanel centerPanel;
 	JTextField name;
@@ -22,6 +35,7 @@ public class SupplierAddPage implements GMMPage {
 		JPanel serverPanel = new JPanel();
 		JPanel locationPanel = new JPanel();
 		JPanel discountPanel = new JPanel();
+		JPanel submitPanel = new JPanel();
 		
 		//create Labels
 		JLabel nameLabel = new JLabel("*Name: ");
@@ -38,6 +52,8 @@ public class SupplierAddPage implements GMMPage {
 		this.locationY = new JTextField(5);
 		this.discount = new JTextField(3);
 		
+		//create button
+		JButton submitButton = new MenuButton("Submit", new SubmitListener());
 		
 		//set fonts
 		nameLabel.setFont(Main.FIELD_FONT);
@@ -46,6 +62,7 @@ public class SupplierAddPage implements GMMPage {
 		locationLabelY.setFont(Main.FIELD_FONT);
 		discountLabel.setFont(Main.FIELD_FONT);
 		afterDiscountLabel.setFont(Main.FIELD_FONT);
+		submitButton.setFont(Main.FIELD_FONT);
 		this.name.setFont(Main.FIELD_FONT);
 		this.server.setFont(Main.FIELD_FONT);
 		this.locationX.setFont(Main.FIELD_FONT);
@@ -64,6 +81,7 @@ public class SupplierAddPage implements GMMPage {
 		discountPanel.add(discountLabel);
 		discountPanel.add(this.discount);
 		discountPanel.add(afterDiscountLabel);
+		submitPanel.add(submitButton);
 		this.centerPanel.setLayout(new GridLayout(12, 3));
 		JLabel header = new JLabel("Add a Supplier", SwingConstants.CENTER);
 		header.setFont(Main.HEADER_FONT);
@@ -72,6 +90,7 @@ public class SupplierAddPage implements GMMPage {
 		this.centerPanel.add(serverPanel);
 		this.centerPanel.add(locationPanel);
 		this.centerPanel.add(discountPanel);
+		this.centerPanel.add(submitPanel);
 		
 		//set BG colors
 		this.centerPanel.setBackground(Main.BG_COLOR);
@@ -79,6 +98,7 @@ public class SupplierAddPage implements GMMPage {
 		serverPanel.setBackground(Main.BG_COLOR);
 		locationPanel.setBackground(Main.BG_COLOR);
 		discountPanel.setBackground(Main.BG_COLOR);
+		submitPanel.setBackground(Main.BG_COLOR);
 		this.name.setBackground(Main.FIELD_COLOR);
 		this.server.setBackground(Main.FIELD_COLOR);
 		this.locationX.setBackground(Main.FIELD_COLOR);
