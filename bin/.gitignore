@@ -8,6 +8,7 @@
 /MenuButton.class
 /MenuListener.class
 /RestockPage.class
+/ShopAddPage$SubmitListener.class
 /ShopAddPage.class
 /SupplierAddPage.class
 /Updater.class
