@@ -29,27 +29,15 @@ public class ShopAddPage implements GMMPage {
 
 		@Override
 		public void actionPerformed(ActionEvent e) {
-			// Temporary Strings to hold text box data
-			String shopname = name.getText();
-			String servername = (String) server.getSelectedItem();
-			String locX = locationX.getText();
-			String locY = locationY.getText();
-			String f = funds.getText();
+			// Only try to add shop if inputs validate correctly
+			if (validateInputs()) {
+				// Parsing integer fields
+				double lX = Double.parseDouble(locationX.getText());
+				double lY = Double.parseDouble(locationY.getText());
+				double funding = funds.getText().equals("") ? 0.00 : Double.parseDouble(funds.getText());
 
-			// Check to see if any of the required fields are empty, throw an
-			// alert and return if so
-			if (shopname.equals("") | servername.equals("") | locX.equals("") | locY.equals("")) {
-				JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please fill out all required field(s).");
-				return;
+				addShop(name.getText(), (String) server.getSelectedItem(), lX, lY, funding);
 			}
-
-			// Parsing integer fields
-			double lX = Double.parseDouble(locX);
-			double lY = Double.parseDouble(locY);
-			double funding;
-			funding = f.equals("") ? 0 : Double.parseDouble(f);
-
-			addShop(name.getText(), (String) server.getSelectedItem(), lX, lY, funding);
 		}
 	}
 
@@ -169,7 +157,7 @@ public class ShopAddPage implements GMMPage {
 			// TODO: Change MerchantID to pass in GUID, use stored procedures to
 			// get needed merchantID internally
 			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addStorefront(?, ?, ?, ?, ?, 1) }");
-//			System.out.println(Main.MerchantID);
+
 			// Registering parameters in the CallableStatement to fill values
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.setString(2, name);
@@ -177,7 +165,7 @@ public class ShopAddPage implements GMMPage {
 			proc.setDouble(4, locX);
 			proc.setDouble(5, locY);
 			proc.setDouble(6, funds);
-//			proc.setString(7, Main.MerchantID);
+			// proc.setString(7, Main.MerchantID);
 
 			proc.execute();
 			int returnVal = proc.getInt(1);
@@ -193,5 +181,56 @@ public class ShopAddPage implements GMMPage {
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
+	}
+
+	// Returns false if any error in validation, true otherwise
+	// Displays error dialogue in accordance with errors in validation
+	public boolean validateInputs() {
+		// Temporary Strings to hold text box data
+		String shopname = name.getText();
+		String servername = (String) server.getSelectedItem();
+		String locX = locationX.getText();
+		String locY = locationY.getText();
+		String f = funds.getText();
+
+		// Check to see if any of the required fields are empty, throw an
+		// alert and return if so
+		if (shopname.equals("") || servername.equals("") || locX.equals("") || locY.equals("")) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please fill out all required field(s).");
+			return false;
+		}
+		// Check that location is numeric
+		if (!isNumeric(locX) || !isNumeric(locY)) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0),
+					"Please enter numeric value(s) for the location.");
+			return false;
+		}
+		// Check that funding is numeric
+		if (!isNumeric(f) && !f.isEmpty()) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please enter a valid number for funds.");
+			return false;
+		}
+		// Check that funding is non-negative
+		if (!f.isEmpty() && Double.parseDouble(f) < 0) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please enter a non-negative number for funds.");
+			return false;
+		}
+
+		return true;
+	}
+
+	/**
+	 * Method to check if given string is numeric or contains other characters
+	 * 
+	 * @param str
+	 * @return true if numeric, false otherwise
+	 */
+	public static boolean isNumeric(String str) {
+		try {
+			double tmp = Double.parseDouble(str);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
 	}
 }
