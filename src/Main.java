@@ -46,12 +46,13 @@ public class Main {
 	static boolean relaunch;
 	static JFrame mainframe;
 	protected static GMMPage marketPage;
+	static Connection conn;
 
 	public static void main(String[] args) {
 		relaunch = true;
 		
 		dbConnect connector = new dbConnect();
-		Connection conn = connector.connect();
+		conn = connector.connect();
 		
 		while (true) {
 			if (relaunch) {
