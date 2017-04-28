@@ -9,6 +9,8 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -48,7 +50,7 @@ public class Main {
 	protected static GMMPage marketPage;
 	static Connection conn;
 
-	public static void main(String[] args) {
+	public static void main(String[] args) throws SQLException {
 		relaunch = true;
 		
 		dbConnect connector = new dbConnect();
