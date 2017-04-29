@@ -1,7 +1,5 @@
 import java.sql.Connection;
 import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.Statement;
 
 public class dbConnect {
 
@@ -13,7 +11,7 @@ public class dbConnect {
 			// TODO: Figure out how to encrypt config file to ensure user+pwd
 			// data isn't visible in plaintext
 			String username = "gmm";
-			String pwd = "333project";
+			String pwd = "abc123";
 			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd + ";databaseName=GMM";
 
 			//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
