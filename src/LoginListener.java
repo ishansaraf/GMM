@@ -1,6 +1,10 @@
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.sql.*;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 
 import javax.swing.JOptionPane;
 import javax.swing.JPasswordField;
@@ -8,7 +12,7 @@ import javax.swing.JTextField;
 
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
-public class LoginListener implements ActionListener {
+public class LoginListener implements ActionListener, KeyListener{
 
 	private JTextField usernameField;
 	private JPasswordField passwordField;
@@ -19,7 +23,28 @@ public class LoginListener implements ActionListener {
 	}
 
 	@Override
-	public void actionPerformed(ActionEvent arg0) {
+	public void actionPerformed(ActionEvent action) {
+		login();
+	}
+	
+	@Override
+	public void keyPressed(KeyEvent e) {
+		if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+			login();
+		}
+	}
+	
+	@Override
+	public void keyReleased(KeyEvent e) {
+		// nothing
+	}
+	
+	@Override
+	public void keyTyped(KeyEvent e) {
+		// nothing
+	}
+	
+	private void login(){
 		// Queries the Merchant Table for the Username and Password
 		// if it finds an entry, sets the MerchantID
 		try {

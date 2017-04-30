@@ -75,6 +75,7 @@ public class SupplierAddPage implements GMMPage {
 		}
 		ComboBoxModel<String> serverModel = new DefaultComboBoxModel<>(modelArray);
 		this.server.setModel(serverModel);
+		this.server.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		
 		//set fonts
 		nameLabel.setFont(Main.FIELD_FONT);
@@ -89,6 +90,20 @@ public class SupplierAddPage implements GMMPage {
 		this.locationX.setFont(Main.FIELD_FONT);
 		this.locationY.setFont(Main.FIELD_FONT);
 		this.discount.setFont(Main.FIELD_FONT);
+		
+		//setForeground
+		nameLabel.setForeground(Main.TEXT_COLOR);
+		serverLabel.setForeground(Main.TEXT_COLOR);
+		locationLabelX.setForeground(Main.TEXT_COLOR);
+		locationLabelY.setForeground(Main.TEXT_COLOR);
+		discountLabel.setForeground(Main.TEXT_COLOR);
+		afterDiscountLabel.setForeground(Main.TEXT_COLOR);
+		submitButton.setForeground(Main.TEXT_COLOR);
+		this.name.setForeground(Main.TEXT_COLOR);
+		this.server.setForeground(Main.TEXT_COLOR);
+		this.locationX.setForeground(Main.TEXT_COLOR);
+		this.locationY.setForeground(Main.TEXT_COLOR);
+		this.discount.setForeground(Main.TEXT_COLOR);
 		
 		//add fields to panels
 		namePanel.add(nameLabel);
@@ -106,6 +121,7 @@ public class SupplierAddPage implements GMMPage {
 		this.centerPanel.setLayout(new GridLayout(12, 3));
 		JLabel header = new JLabel("Add a Supplier", SwingConstants.CENTER);
 		header.setFont(Main.HEADER_FONT);
+		header.setForeground(Main.TEXT_COLOR);
 		this.centerPanel.add(header);
 		this.centerPanel.add(namePanel);
 		this.centerPanel.add(serverPanel);

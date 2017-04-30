@@ -1,21 +1,21 @@
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.List;
 
 import javax.swing.BoxLayout;
+import javax.swing.ComboBoxModel;
 import javax.swing.DefaultComboBoxModel;
-import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
-import javax.swing.ScrollPaneConstants;
 import javax.swing.SwingConstants;
+import javax.swing.text.AbstractDocument;
 
 public class RestockPage implements GMMPage {
 
@@ -32,8 +32,7 @@ public class RestockPage implements GMMPage {
 	JPanel centerPanel;
 	JComboBox<String> Shop;
 	JComboBox<String> Supplier;
-	JList<JPanel> Orders;
-	DefaultListModel<JPanel> OrdersModel;
+	JPanel Orders;
 	
 	public RestockPage() {
 		//create panels
@@ -46,6 +45,7 @@ public class RestockPage implements GMMPage {
 		//create Labels
 		JLabel shopLabel = new JLabel("*Shop:     ");
 		JLabel supplierLabel = new JLabel("*Supplier: ");
+		JLabel ordersHeaderLabel = new JLabel("Item:                      Quantity:         ");
 		
 		//create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());
@@ -54,14 +54,15 @@ public class RestockPage implements GMMPage {
 		this.Shop = new JComboBox<>();
 		this.Supplier = new JComboBox<>();
 		
-		this.OrdersModel = new DefaultListModel<>();
-		this.Orders = new JList<>(this.OrdersModel);
+		this.Orders = new JPanel(new GridLayout(20, 1));
 		
 		JScrollPane ordersScrollPane = new JScrollPane(this.Orders);
-		ordersScrollPane.setViewportView(this.Orders);
-		ordersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
-		ordersScrollPane.setPreferredSize(new Dimension(295, 400));
-		this.addOrder();
+//		ordersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		ordersScrollPane.setPreferredSize(new Dimension(800, 308));
+		for (int i = 0; i < 20; i++) {			
+			this.addOrder();
+		}	
+		ordersScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
 		
 		//populate Shop ComboBox
 		List<String> tempArrList = Main.getShopList();
@@ -71,6 +72,7 @@ public class RestockPage implements GMMPage {
 			modelArray[i+1] = tempArrList.get(i);
 		}
 		this.Shop.setModel(new DefaultComboBoxModel<>(modelArray));
+		this.Shop.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		
 		//populate Supplier ComboBox
 		tempArrList = Main.getSupplierList();
@@ -80,29 +82,42 @@ public class RestockPage implements GMMPage {
 			modelArray[i+1] = tempArrList.get(i);
 		}
 		this.Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
+		this.Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		
 		//set fonts
 		shopLabel.setFont(Main.FIELD_FONT);
 		supplierLabel.setFont(Main.FIELD_FONT);
+		ordersHeaderLabel.setFont(Main.FIELD_FONT);
 		submitButton.setFont(Main.FIELD_FONT);
 		this.Shop.setFont(Main.FIELD_FONT);
 		this.Supplier.setFont(Main.FIELD_FONT);
-		this.Orders.setFont(Main.FIELD_FONT);		
+		this.Orders.setFont(Main.FIELD_FONT);
+		
+		//set foreground
+		shopLabel.setForeground(Main.TEXT_COLOR);
+		supplierLabel.setForeground(Main.TEXT_COLOR);
+		ordersHeaderLabel.setForeground(Main.TEXT_COLOR);
+		submitButton.setForeground(Main.TEXT_COLOR);
+		this.Shop.setForeground(Main.TEXT_COLOR);
+		this.Supplier.setForeground(Main.TEXT_COLOR);
+		this.Orders.setForeground(Main.TEXT_COLOR);
 		
 		//add stuff to stuff
 		shopPanel.add(shopLabel);
 		shopPanel.add(this.Shop);
 		supplierPanel.add(supplierLabel);
 		supplierPanel.add(this.Supplier);
-		ordersPanel.add(this.Orders);
+		ordersPanel.add(ordersScrollPane);
 		submitPanel.add(submitButton);
 		this.centerPanel.setLayout(new BoxLayout(this.centerPanel, BoxLayout.PAGE_AXIS));
-		JLabel header = new JLabel("Add a Supplier", SwingConstants.CENTER);
+		JLabel header = new JLabel("               Restock a Store", SwingConstants.CENTER);
 		header.setFont(Main.HEADER_FONT);
+		header.setForeground(Main.TEXT_COLOR);
 		this.centerPanel.add(header);
 		this.centerPanel.add(shopPanel);
 		this.centerPanel.add(supplierPanel);
-		this.centerPanel.add(ordersScrollPane);
+		this.centerPanel.add(ordersHeaderLabel);
+		this.centerPanel.add(ordersPanel);
 		this.centerPanel.add(submitPanel);
 		
 		//set BG colors
@@ -111,25 +126,58 @@ public class RestockPage implements GMMPage {
 		supplierPanel.setBackground(Main.BG_COLOR);
 		ordersPanel.setBackground(Main.BG_COLOR);
 		submitPanel.setBackground(Main.BG_COLOR);
+		this.Orders.setBackground(Main.BG_COLOR);
+		this.Shop.setBackground(Main.FIELD_COLOR);
+		this.Supplier.setBackground(Main.FIELD_COLOR);
 	}
 	
 	private void addOrder() {
 		JPanel orderPanel = new JPanel();
 		
 		JComboBox<String> Item = new JComboBox<>();
-		JTextField Quantity = new JTextField();
+		JLabel Spacer = new JLabel("     ");
+		JTextField Quantity = new JTextField(4);
+		((AbstractDocument)Quantity.getDocument()).setDocumentFilter(new LimitDocumentFilter(4));
 		
+		//populate ComboBox
+		List<String> tempArrList = Main.getItemList();
+		String[] modelArray = new String[tempArrList.size()+1];
+		modelArray[0] = "                    ";
+		for (int i = 0; i < modelArray.length-1; i++) {
+			modelArray[i+1] = tempArrList.get(i);
+		}
+		ComboBoxModel<String> ItemModel = new DefaultComboBoxModel<>(modelArray);
+		Item.setModel(ItemModel);
+		Item.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
+		
+		//set fonts
 		Item.setFont(Main.FIELD_FONT);
 		Quantity.setFont(Main.FIELD_FONT);
+		Spacer.setFont(Main.FIELD_FONT);
 		
+		//set foreground color
+		Item.setForeground(Main.TEXT_COLOR);
+		Quantity.setForeground(Main.TEXT_COLOR);
+		
+		//add to panel
 		orderPanel.add(Item);
+		orderPanel.add(Spacer);
 		orderPanel.add(Quantity);
 		
-		orderPanel.setBackground(Main.BG_COLOR);
+		//alternate panel colors
+		if (this.Orders.getComponentCount() % 2 == 0){			
+			orderPanel.setBackground(Main.BG_COLOR2);
+		}
+		else {
+			orderPanel.setBackground(Main.BG_COLOR);
+		}
+		
+		//set background colors
 		Item.setBackground(Main.FIELD_COLOR);
 		Quantity.setBackground(Main.FIELD_COLOR);
 		
-		this.OrdersModel.addElement(orderPanel);
+		//add and refresh
+		this.Orders.add(orderPanel);
 		Main.mainframe.repaint();
 	}
 

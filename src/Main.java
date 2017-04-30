@@ -34,9 +34,11 @@ import javax.swing.text.AbstractDocument;
  */
 public class Main {
 
-	public static final Color BG_COLOR = new Color(100, 100, 200);
-	public static final Color FIELD_COLOR = new Color(150, 150, 250);
-	public static final Color MENU_BUTTON_COLOR = new Color(50, 50, 150);
+	public static final Color BG_COLOR = new Color(43, 43, 43);//new Color(100, 100, 200);
+	public static final Color BG_COLOR2 = new Color(33, 33, 33);//new Color(90, 90, 180);
+	public static final Color FIELD_COLOR = new Color(23, 23, 23);//new Color(150, 150, 250);
+	public static final Color MENU_BUTTON_COLOR = new Color(13, 13, 13);//new Color(50, 50, 150);
+	public static final Color TEXT_COLOR = new Color(220, 220, 220);
 	public static final JLabel EMPTY_CELL = new JLabel();
 	public static final Font HEADER_FONT = new Font(null, Font.BOLD, 24);
 	public static final Font FIELD_FONT = new Font(Font.MONOSPACED, Font.BOLD, 18);
@@ -103,6 +105,10 @@ public class Main {
 		JLabel logoImgLabel = new JLabel(new ImageIcon(logoImg));
 		JLabel UsernameLabel = new JLabel("Username:");
 		JLabel PasswordLabel = new JLabel("Password:");
+		
+		//setForeground
+		UsernameLabel.setForeground(TEXT_COLOR);
+		PasswordLabel.setForeground(TEXT_COLOR);
 
 		// create fields
 		JTextField UsernameField = new JTextField(15);
@@ -112,6 +118,7 @@ public class Main {
 		((AbstractDocument)UsernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 
 		// misc construct & settings
+		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
@@ -206,7 +213,7 @@ public class Main {
 	public static List<String> getShopList() {
 		// DEBUG CODE START
 		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 30; i++) {
+		for (int i = 1; i <= 7; i++) {
 			dummyList.add("Shop" + i);
 		}
 		return dummyList;
@@ -241,6 +248,16 @@ public class Main {
 		List<String> dummyList = new ArrayList<>();
 		for (int i = 1; i <= 17; i++) {
 			dummyList.add("Supplier" + i);
+		}
+		return dummyList;
+		// DEBUG CODE END
+	}
+
+	public static List<String> getItemList() {
+		// DEBUG CODE START
+		List<String> dummyList = new ArrayList<>();
+		for (int i = 1; i <= 50; i++) {
+			dummyList.add("Item" + i);
 		}
 		return dummyList;
 		// DEBUG CODE END

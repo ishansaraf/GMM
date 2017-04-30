@@ -57,13 +57,25 @@ public class ShopAddPage implements GMMPage {
 		JLabel locationLabelX = new JLabel("*Location: x=");
 		JLabel locationLabelY = new JLabel(" y=");
 		JLabel fundsLabel = new JLabel(" Current Funds:    ");
-
+		
 		// create Fields
 		this.name = new JTextField(26);
 		this.server = new JComboBox<>();
 		this.locationX = new JTextField(8);
 		this.locationY = new JTextField(8);
 		this.funds = new JTextField(14);
+		
+		//set foregrounds
+		nameLabel.setForeground(Main.TEXT_COLOR);
+		serverLabel.setForeground(Main.TEXT_COLOR);
+		locationLabelX.setForeground(Main.TEXT_COLOR);
+		locationLabelY.setForeground(Main.TEXT_COLOR);
+		fundsLabel.setForeground(Main.TEXT_COLOR);
+		this.name.setForeground(Main.TEXT_COLOR);
+		this.server.setForeground(Main.TEXT_COLOR);
+		this.locationX.setForeground(Main.TEXT_COLOR);
+		this.locationY.setForeground(Main.TEXT_COLOR);
+		this.funds.setForeground(Main.TEXT_COLOR);
 		
 		//limit fields
 		((AbstractDocument)this.name.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
@@ -83,6 +95,7 @@ public class ShopAddPage implements GMMPage {
 		}
 		ComboBoxModel<String> serverModel = new DefaultComboBoxModel<>(modelArray);
 		this.server.setModel(serverModel);
+		this.server.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 
 		// set fonts
 		nameLabel.setFont(Main.FIELD_FONT);
@@ -112,6 +125,7 @@ public class ShopAddPage implements GMMPage {
 		this.centerPanel.setLayout(new GridLayout(12, 3));
 		JLabel header = new JLabel("Add a Storefront", SwingConstants.CENTER);
 		header.setFont(Main.HEADER_FONT);
+		header.setForeground(Main.TEXT_COLOR);
 		this.centerPanel.add(header);
 		this.centerPanel.add(namePanel);
 		this.centerPanel.add(serverPanel);

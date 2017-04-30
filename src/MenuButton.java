@@ -1,4 +1,3 @@
-import java.awt.Color;
 import java.awt.event.ActionListener;
 
 import javax.swing.JButton;
@@ -15,7 +14,7 @@ public class MenuButton extends JButton {
 	public MenuButton(String text, ActionListener listener) {
 		super(text);
 		this.setBackground(Main.MENU_BUTTON_COLOR);
-		this.setForeground(Color.WHITE);
+		this.setForeground(Main.TEXT_COLOR);
 		this.setFocusPainted(false);
 		this.addActionListener(listener);
 	}

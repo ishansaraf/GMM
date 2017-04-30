@@ -31,12 +31,15 @@ public class MarketPage implements GMMPage{
 		this.eastPanel = new JPanel();
 		
 		//set BG colors
-		this.eastPanel.setBackground(Main.BG_COLOR);
+		this.eastPanel.setBackground(Main.BG_COLOR2);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		
 		//create the updateFeed Listbox for displaying updates
 		this.updateListModel = new DefaultListModel<>();
 		this.updateFeed = new JList<>(this.updateListModel);
+		this.updateFeed.setBackground(Main.BG_COLOR);
+		this.updateFeed.setForeground(Main.TEXT_COLOR);
+		this.updateFeed.setCellRenderer(new CSCListCellRenderer(Main.BG_COLOR));
 		this.updateListModel.addElement("initilaized update feed!");
 		
 		//put the update feed into a JScrollPane for scrolling
@@ -47,6 +50,9 @@ public class MarketPage implements GMMPage{
 		//create the shopList Listbox for displaying updates
 		this.shopListModel = new DefaultListModel<>();
 		this.shopList = new JList<>(this.shopListModel);
+		this.shopList.setBackground(Main.BG_COLOR);
+		this.shopList.setForeground(Main.TEXT_COLOR);
+		this.shopList.setCellRenderer(new CSCListCellRenderer(Main.FIELD_COLOR));
 		for (String ShopID : Main.getShopList()) {
 			this.shopListModel.addElement(ShopID);
 		}
