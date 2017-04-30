@@ -8,7 +8,13 @@ import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
-
+/**
+ * 
+ * page for market data viewing
+ *
+ * @author Alan Holman
+ *         Created Apr 30, 2017.
+ */
 public class MarketPage implements GMMPage{
 
 	JPanel eastPanel;
