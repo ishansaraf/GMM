@@ -3,7 +3,6 @@ import java.sql.DriverManager;
 
 public class dbConnect {
 
-	@SuppressWarnings("resource")
 	public Connection connect() {
 		Connection conn = null;
 		try {
@@ -14,19 +13,7 @@ public class dbConnect {
 			String pwd = "abc123";
 			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd + ";databaseName=GMM";
 
-			//Class.forName("com.microsoft.sqlserver.jdbc.SQLServerDriver");
-
 			conn = DriverManager.getConnection(connectionURL);
-
-			// FOR DEBUG PURPOSES
-			// Statement test = conn.createStatement();
-			// String testQuery = "SELECT * FROM Item";
-			// ResultSet rs = test.executeQuery(testQuery);
-			// while (rs.next()) {
-			// System.out.println(rs.getString("Name"));
-			// System.out.println(rs.getString("Description"));
-			// System.out.println(rs.getString("BaseValue"));
-			// }
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
