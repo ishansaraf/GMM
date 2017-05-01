@@ -44,7 +44,6 @@ public class GameHandler implements Runnable {
 			String chatline = this.game.nextChatLine();
 			if (chatline == null) break;
 			this.parseChatLine(chatline);
-			Main.updateQueue.add(chatline);
 		}
 		
 		
@@ -64,9 +63,10 @@ public class GameHandler implements Runnable {
 			if (ajb.contains(" from ") && ajb.charAt(ajb.length()-1) == '!'){
 				//Its a buy order
 				this.sendBuyOrder(chatline);
+				Main.updateQueue.add(chatline);
 			}
 		}
-		
+//		System.out.println(chatline);
 	}
 
 	private boolean isValidPlayer(String playerName) {
@@ -77,7 +77,7 @@ public class GameHandler implements Runnable {
 
 	private void sendBuyOrder(String chatline) {
 		// TODO greate stored proc for sending in buy orders
-		System.out.println("buy order should be placed");
+//		System.out.println(chatline + " buyOrder to be placed");
 	}
 
 //	/**
