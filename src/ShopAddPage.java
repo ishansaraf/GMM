@@ -36,7 +36,7 @@ public class ShopAddPage implements GMMPage {
 				double lX = Double.parseDouble(locationX.getText());
 				double lY = Double.parseDouble(locationY.getText());
 				double funding = funds.getText().equals("") ? 0.00 : Double.parseDouble(funds.getText());
-				System.out.println(funding);
+				
 				addShop(name.getText(), (String) server.getSelectedItem(), lX, lY, funding);
 			}
 		}
@@ -247,13 +247,13 @@ public class ShopAddPage implements GMMPage {
 			return false;
 		}
 		// Check that location is numeric
-		if (!isNumeric(locX) || !isNumeric(locY)) {
+		if (!Main.isNumeric(locX) || !Main.isNumeric(locY)) {
 			JOptionPane.showMessageDialog(centerPanel.getComponent(0),
 					"Please enter numeric value(s) for the location.");
 			return false;
 		}
 		// Check that funding is numeric
-		if (!isNumeric(f) && !f.isEmpty()) {
+		if (!Main.isNumeric(f) && !f.isEmpty()) {
 			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please enter a valid number for funds.");
 			return false;
 		}
@@ -263,21 +263,6 @@ public class ShopAddPage implements GMMPage {
 			return false;
 		}
 
-		return true;
-	}
-
-	/**
-	 * Method to check if given string is numeric or contains other characters
-	 * 
-	 * @param str
-	 * @return true if numeric, false otherwise
-	 */
-	public static boolean isNumeric(String str) {
-		try {
-			double tmp = Double.parseDouble(str);
-		} catch (Exception e) {
-			return false;
-		}
 		return true;
 	}
 }

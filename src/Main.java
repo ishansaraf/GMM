@@ -263,4 +263,20 @@ public class Main {
 		return dummyList;
 		// DEBUG CODE END
 	}
+	
+
+	/**
+	 * Method to check if given string is numeric or contains other characters
+	 * 
+	 * @param str
+	 * @return true if numeric, false otherwise
+	 */
+	public static boolean isNumeric(String str) {
+		try {
+			double tmp = Double.parseDouble(str);
+		} catch (Exception e) {
+			return false;
+		}
+		return true;
+	}
 }

@@ -18,23 +18,29 @@ import javax.swing.SwingConstants;
 import javax.swing.text.AbstractDocument;
 
 public class SupplierAddPage implements GMMPage {
-
-	public class SubmitListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// TODO Auto-generated method stub.
-
-		}
-
-	}
-
+	
+	// Fields for GUI
 	JPanel centerPanel;
 	JTextField name;
 	JComboBox<String> server;
 	JTextField locationX;
 	JTextField locationY;
 	JTextField discount;
+	
+	public class SubmitListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			if (validateInputs()) {
+				// Parsing numeric fields
+				double lX = Double.parseDouble(locationX.getText());
+				double lY = Double.parseDouble(locationY.getText());
+				double dis = discount.getText().equals("") ? 0.00 : Double.parseDouble(discount.getText());
+				
+				addSupplier(name.getText(), (String) server.getSelectedItem(), lX, lY, dis);
+			}
+		}
+	}
 
 	public SupplierAddPage() {
 		// create panels
@@ -188,7 +194,7 @@ public class SupplierAddPage implements GMMPage {
 	 */
 	public void addSupplier(String name, String server, double locX, double locY, double discount) {
 		try {
-			CallableStatement proc = Main.conn.prepareCall(" ? = call dbo.addSupplier(?, ?, ?, ?, ?, ?)");
+			CallableStatement proc = Main.conn.prepareCall(" ? = call dbo.addSupplier(?, ?, ?, ?, ?)");
 
 			// Registering parameters in CallableStatement
 			proc.setString(2, name);
@@ -196,7 +202,6 @@ public class SupplierAddPage implements GMMPage {
 			proc.setDouble(4, locX);
 			proc.setDouble(5, locY);
 			proc.setDouble(6, discount);
-			proc.setString(7, Main.MerchantID);
 
 			// Getting return code from stored procedure to indicate
 			// success/error
@@ -231,7 +236,27 @@ public class SupplierAddPage implements GMMPage {
 	 * @return true if inputs are valid, false otherwise
 	 */
 	public boolean validateInputs() {
-		// TODO
-		return false;
+		String supname = name.getText();
+		String servername = (String) server.getSelectedItem();
+		String locX = locationX.getText();
+		String locY = locationY.getText();
+		String disc = discount.getText();
+		
+		if(supname.equals("") || servername.equals("") || locX.equals("") || locY.equals("")) {
+			JOptionPane.showMessageDialog(null, "Please fill out all required fields.");
+			return false;
+		}
+		else if (!Main.isNumeric(locX) || !Main.isNumeric(locY)) {
+			JOptionPane.showMessageDialog(null, "Please enter numeric value(s) for the location.");
+			return false;
+		}
+		else if (!Main.isNumeric(disc) && !disc.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "Please enter numeric value for discount.");
+			return false;
+		}
+		else if (!disc.isEmpty() && (Double.parseDouble(disc) < 0 || Double.parseDouble(disc) > 100)) {
+			JOptionPane.showMessageDialog(null, "Please enter a value between 0 and 100 for the discount.");
+		}
+		return true;
 	}
 }
