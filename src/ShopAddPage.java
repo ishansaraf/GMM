@@ -213,6 +213,10 @@ public class ShopAddPage implements GMMPage {
 						"Storefront already exists in the database. Please input new parameters and try again.");
 			else if (returnVal == 0) {
 				JOptionPane.showMessageDialog(null, "Store " + name + " was successfully added!");
+				
+				//update loaded list
+				Main.shopList.add(name);
+				
 				// blank out fields after success
 				this.name.setText("");
 				this.server.setSelectedIndex(0);

@@ -181,12 +181,40 @@ public class RestockPage implements GMMPage {
 		Main.mainframe.repaint();
 	}
 
+	private void updateComboBoxes(){
+		//update Shop ComboBox
+		List<String> tempArrList = Main.getShopList();
+		String[] modelArray;
+		if (this.Shop.getModel().getSize() != tempArrList.size()) {
+			modelArray = new String[tempArrList.size()+1];
+			modelArray[0] = "                      ";
+			for (int i = 0; i < modelArray.length-1; i++) {
+				modelArray[i+1] = tempArrList.get(i);
+			}
+			this.Shop.setModel(new DefaultComboBoxModel<>(modelArray));
+			this.Shop.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
+		}
+		//update Supplier ComboBox
+		tempArrList = Main.getSupplierList();
+		System.out.println(this.Supplier.getModel().getSize()-1 + " vs. " + tempArrList.size());
+		if (this.Supplier.getModel().getSize()-1 != tempArrList.size()) {
+			modelArray = new String[tempArrList.size()+1];
+			modelArray[0] = "                      ";
+			for (int i = 0; i < modelArray.length-1; i++) {
+				modelArray[i+1] = tempArrList.get(i);
+			}
+			this.Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
+			this.Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
+		}
+	}
+	
 	@Override
 	public void changeToPage() {
 		if (Main.curPage != this) {
 			Main.curPage.unShow();
 			Main.mainframe.add(this.centerPanel, BorderLayout.CENTER);
 			Main.curPage = this;
+			updateComboBoxes();
 			Main.mainframe.revalidate();
 			Main.mainframe.repaint();
 			System.out.println("RestockPage Loaded");

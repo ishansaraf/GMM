@@ -216,6 +216,10 @@ public class SupplierAddPage implements GMMPage {
 						"Supplier already exists in database. Please input new parameters.");
 			else if (returnVal == 0) {
 				JOptionPane.showMessageDialog(null, "Supplier " + name + " was successfully added!");
+				
+				//update loaded list
+				Main.supplierList.add(name);
+				
 				// Blanking out fields
 				this.name.setText("");
 				this.server.setSelectedIndex(0);
