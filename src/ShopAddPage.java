@@ -177,7 +177,7 @@ public class ShopAddPage implements GMMPage {
 		try {
 			// TODO: Change MerchantID to pass in GUID, use stored procedures to
 			// get needed merchantID internally
-			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addStorefront(?, ?, ?, ?, ?, 1) }");
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addStorefront(?, ?, ?, ?, ?, ?) }");
 
 			// Registering parameters in the CallableStatement to fill values
 			proc.registerOutParameter(1, Types.INTEGER);
@@ -186,7 +186,7 @@ public class ShopAddPage implements GMMPage {
 			proc.setDouble(4, locX);
 			proc.setDouble(5, locY);
 			proc.setDouble(6, funds);
-			// proc.setString(7, Main.MerchantID);
+			proc.setString(7, Main.MerchantID);
 
 			proc.execute();
 			int returnVal = proc.getInt(1);

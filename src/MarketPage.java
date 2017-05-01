@@ -10,7 +10,7 @@ import javax.swing.JScrollPane;
 import javax.swing.ScrollPaneConstants;
 /**
  * 
- * page for market data viewing
+ * Page for market data viewing
  *
  * @author Alan Holman
  *         Created Apr 30, 2017.
