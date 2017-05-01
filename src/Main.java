@@ -8,7 +8,9 @@ import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.sql.CallableStatement;
 import java.sql.Connection;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.LinkedList;
@@ -45,6 +47,11 @@ public class Main {
 
 	static String MerchantID;
 	static Queue<String> updateQueue;
+	static List<String> serverList;
+	static List<String> supplierList;
+	static List<String> itemList;
+	static List<String> shopList;
+	
 	static JPanel menuBar;
 	static GMMPage curPage;
 	static boolean relaunch;
@@ -65,6 +72,10 @@ public class Main {
 				mainframe.setTitle("GMM Marketing Solutions");
 				mainframe.setResizable(false);
 				mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+				shopList = new ArrayList<>();
+				serverList = new ArrayList<>();
+				supplierList = new ArrayList<>();
+				itemList = new ArrayList<>();
 				login();
 				relaunch = false;
 			}
@@ -211,13 +222,17 @@ public class Main {
 	 * @return List<String>
 	 */
 	public static List<String> getShopList() {
-		// DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 7; i++) {
-			dummyList.add("Shop" + i);
+		if (shopList.isEmpty()){
+			try {
+				CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList()}");
+				ResultSet rs = proc.executeQuery();
+				while(rs.next()) {
+					shopList.add(rs.getString(1));
+				}
+			}
+			catch (SQLException exception) {exception.printStackTrace();}
 		}
-		return dummyList;
-		// DEBUG CODE END
+		return shopList;
 	}
 
 	private static class LogOutListener implements ActionListener {
@@ -234,34 +249,45 @@ public class Main {
 	}
 
 	public static List<String> getServerList() {
-		// DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		dummyList.add("Rose");
-//		for (int i = 1; i <= 7; i++) {
-//			dummyList.add("Server" + i);
-//		}
-		return dummyList;
-		// DEBUG CODE END
+		if (serverList.isEmpty()){
+			try {
+				CallableStatement proc = Main.conn.prepareCall("{call dbo.getServerList()}");
+				ResultSet rs = proc.executeQuery();
+				while(rs.next()) {
+					serverList.add(rs.getString(1));
+				}
+			}
+			catch (SQLException exception) {exception.printStackTrace();}
+		}
+		return serverList;
 	}
 
 	public static List<String> getSupplierList() {
-		// DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 17; i++) {
-			dummyList.add("Supplier" + i);
+		if (supplierList.isEmpty()){
+			try {
+				CallableStatement proc = Main.conn.prepareCall("{call dbo.getSupplierList()}");
+				ResultSet rs = proc.executeQuery();
+				while(rs.next()) {
+					supplierList.add(rs.getString(1));
+				}
+			}
+			catch (SQLException exception) {exception.printStackTrace();}
 		}
-		return dummyList;
-		// DEBUG CODE END
+		return supplierList;
 	}
 
 	public static List<String> getItemList() {
-		// DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 50; i++) {
-			dummyList.add("Item" + i);
+		if (itemList.isEmpty()){
+			try {
+				CallableStatement proc = Main.conn.prepareCall("{call dbo.getItemList()}");
+				ResultSet rs = proc.executeQuery();
+				while(rs.next()) {
+					itemList.add(rs.getString(1));
+				}
+			}
+			catch (SQLException exception) {exception.printStackTrace();}
 		}
-		return dummyList;
-		// DEBUG CODE END
+		return itemList;
 	}
 	
 
