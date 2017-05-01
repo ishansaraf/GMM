@@ -186,7 +186,7 @@ public class ShopAddPage implements GMMPage {
 	 * @param locY:
 	 *            y coordinates of the server
 	 * @param funds:
-	 *            initial amount of funds the storefront ha
+	 *            initial amount of funds the storefront has
 	 */
 	public void addShop(String name, String server, double locX, double locY, double funds) {
 		try {
@@ -200,7 +200,8 @@ public class ShopAddPage implements GMMPage {
 			proc.setDouble(6, funds);
 			proc.setString(7, Main.MerchantID);
 
-			// Getting return code from stored procedure
+			// Getting return code from stored procedure to indicate
+			// success/error
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.execute();
 
@@ -226,8 +227,8 @@ public class ShopAddPage implements GMMPage {
 	}
 
 	/**
-	 * Checks if the text fields in the GUI contain valid inputs, gives error
-	 * messages otherwise
+	 * Checks if the text fields in the GUI contain valid inputs, gives
+	 * appropriate error messages otherwise
 	 * 
 	 * @return true if inputs are valid, false otherwise
 	 */
