@@ -12,8 +12,7 @@ import javax.swing.JOptionPane;
 
 /**
  * 
- * Simulated Game that simulates actions done in the game in a meaningful way
- * based on certain information gathered from the database.
+ * Simulated Game that simulates player actions done in the game
  *
  * @author holmanah.
  *         Created Apr 14, 2017.
@@ -111,6 +110,14 @@ public class Game {
 	public void update() {
 		//TODO updates the game (duh...)
 		updatePlayers();
+		junkifyChat();
+	}
+
+	private void junkifyChat() {
+		//TODO make/get a bunch of junky MMO chat messages, and add some edge cases
+		// for testing the parser in GameHandler
+		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
+		this.chatlog.add(timeStamp + " Hiro: I just bought this solomons bow from Eltear for sooo cheap!");
 	}
 	
 }
