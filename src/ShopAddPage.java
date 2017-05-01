@@ -57,15 +57,15 @@ public class ShopAddPage implements GMMPage {
 		JLabel locationLabelX = new JLabel("*Location: x=");
 		JLabel locationLabelY = new JLabel(" y=");
 		JLabel fundsLabel = new JLabel(" Current Funds:    ");
-		
+
 		// create Fields
 		this.name = new JTextField(26);
 		this.server = new JComboBox<>();
 		this.locationX = new JTextField(8);
 		this.locationY = new JTextField(8);
 		this.funds = new JTextField(14);
-		
-		//set foregrounds
+
+		// set foregrounds
 		nameLabel.setForeground(Main.TEXT_COLOR);
 		serverLabel.setForeground(Main.TEXT_COLOR);
 		locationLabelX.setForeground(Main.TEXT_COLOR);
@@ -76,12 +76,12 @@ public class ShopAddPage implements GMMPage {
 		this.locationX.setForeground(Main.TEXT_COLOR);
 		this.locationY.setForeground(Main.TEXT_COLOR);
 		this.funds.setForeground(Main.TEXT_COLOR);
-		
-		//limit fields
-		((AbstractDocument)this.name.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
-		((AbstractDocument)this.locationX.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
-		((AbstractDocument)this.locationY.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
-		((AbstractDocument)this.funds.getDocument()).setDocumentFilter(new LimitDocumentFilter(14));
+
+		// limit fields
+		((AbstractDocument) this.name.getDocument()).setDocumentFilter(new LimitDocumentFilter(25));
+		((AbstractDocument) this.locationX.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument) this.locationY.getDocument()).setDocumentFilter(new LimitDocumentFilter(7));
+		((AbstractDocument) this.funds.getDocument()).setDocumentFilter(new LimitDocumentFilter(14));
 
 		// create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());
@@ -173,14 +173,26 @@ public class ShopAddPage implements GMMPage {
 		System.out.println("ShopAddPage Unloaded");
 	}
 
+	/**
+	 * Uses the database connection to add a storefront in the database, using
+	 * the given input fields
+	 * 
+	 * @param name:
+	 *            name of the storefront
+	 * @param server:
+	 *            name of the server where the storefront is
+	 * @param locX:
+	 *            x coordinates of the storeront
+	 * @param locY:
+	 *            y coordinates of the server
+	 * @param funds:
+	 *            initial amount of funds the storefront ha
+	 */
 	public void addShop(String name, String server, double locX, double locY, double funds) {
 		try {
-			// TODO: Change MerchantID to pass in GUID, use stored procedures to
-			// get needed merchantID internally
 			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addStorefront(?, ?, ?, ?, ?, ?) }");
 
 			// Registering parameters in the CallableStatement to fill values
-			proc.registerOutParameter(1, Types.INTEGER);
 			proc.setString(2, name);
 			proc.setString(3, server);
 			proc.setDouble(4, locX);
@@ -188,31 +200,37 @@ public class ShopAddPage implements GMMPage {
 			proc.setDouble(6, funds);
 			proc.setString(7, Main.MerchantID);
 
+			// Getting return code from stored procedure
+			proc.registerOutParameter(1, Types.INTEGER);
 			proc.execute();
+
 			int returnVal = proc.getInt(1);
 
 			// Checking that addition of store front returned successfully
 			if (returnVal == 1)
-				JOptionPane.showMessageDialog(null, 
+				JOptionPane.showMessageDialog(null,
 						"Storefront already exists in the database. Please input new parameters and try again.");
 			else if (returnVal == 0) {
 				JOptionPane.showMessageDialog(null, "Store " + name + " was successfully added!");
-				//blank out fields after success
+				// blank out fields after success
 				this.name.setText("");
 				this.server.setSelectedIndex(0);
 				this.locationX.setText("");
 				this.locationY.setText("");
 				this.funds.setText("");
-			}
-			else
+			} else
 				JOptionPane.showMessageDialog(null, "Storefront addition failed. Error code is: " + returnVal);
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 	}
 
-	// Returns false if any error in validation, true otherwise
-	// Displays error dialogue in accordance with errors in validation
+	/**
+	 * Checks if the text fields in the GUI contain valid inputs, gives error
+	 * messages otherwise
+	 * 
+	 * @return true if inputs are valid, false otherwise
+	 */
 	public boolean validateInputs() {
 		// Temporary Strings to hold text box data
 		String shopname = name.getText();
