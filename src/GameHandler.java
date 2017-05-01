@@ -1,6 +1,4 @@
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -27,7 +25,6 @@ public class GameHandler implements Runnable {
 	public void run() {
 		while(!this.shutDown) {
 			pollforUpdates();
-			updateShops();
 			try {
 				Thread.sleep(5000);
 			} catch (InterruptedException exception) {
@@ -43,25 +40,63 @@ public class GameHandler implements Runnable {
 	 *
 	 */
 	private void pollforUpdates() {
+		while(true) {
+			String chatline = this.game.nextChatLine();
+			if (chatline == null) break;
+			this.parseChatLine(chatline);
+			Main.updateQueue.add(chatline);
+		}
+		
+		
+		
 		this.game.update();
 	}
 
-	/**
-	 * runs doShopRestock for each shop belonging to the Merchant
-	 *
-	 */
-	private void updateShops() {
-		List<String> shopsList = Main.getShopList();
-		for (int i = 0; i < shopsList.size(); i++) {
-			doShopRestock(shopsList.get(i));
+	private void parseChatLine(String chatline) {
+		//TODO additional constraints to note:
+		//	nothing should have a : in its name
+		//  also shouldn't contain spaces
+		String noTimeLine = chatline.substring(24);
+		String playerName = noTimeLine.split(":")[0];
+		boolean valid = this.isValidPlayer(playerName);
+		if (!valid && playerName.contains(" just bought ")) {
+			String ajb = playerName.split(" just bought ")[1];
+			if (ajb.contains(" from ") && ajb.charAt(ajb.length()-1) == '!'){
+				//Its a buy order
+				this.sendBuyOrder(chatline);
+			}
 		}
+		
 	}
+
+	private boolean isValidPlayer(String playerName) {
+		// TODO create stored proc for checking if the playerName is valid
+		// REMEMBER TO SANITIZE INPUT
+		return false;
+	}
+
+	private void sendBuyOrder(String chatline) {
+		// TODO greate stored proc for sending in buy orders
+		System.out.println("buy order should be placed");
+	}
+
+//	/**
+//	 * runs doShopRestock for each shop belonging to the Merchant
+//	 *
+//	 */
+//	private void updateShops() {
+//		List<String> shopsList = Main.getShopList();
+//		for (int i = 0; i < shopsList.size(); i++) {
+////			doShopRestock(shopsList.get(i));
+//		}
+//	}
+	
 	/**
 	 * gets the list of players currently online on the server from the (simulated) Game
 	 *
 	 * @return
 	 */
-	private List<String> getPlayerList() {
+	private List<Integer> getPlayerList() {
 		return this.game.getPlayerList();
 	}
 	
@@ -81,30 +116,30 @@ public class GameHandler implements Runnable {
 		//DEBUG CODE END
 	}
 	
-	/**
-	 * TODO randomly decides whether or not the Storefront should restock with higher bias
-	 * when Inventory is lower. If so, determines which items to stock by choosing with bias
-	 * for Items bought recently that have a high AVG(Profit/TimeSpan). Also Biased toward Suppliers
-	 *  that are closer to the Storefront and with higher discounts.
-	 *   This is calculated using queries to the: 
-	 *   	-StoreStocksItems Table for counting size of inventory
-	 *   	-BuyOrder Table for items within a recent Datetime for the particular ShopID 
-	 *   		counting the total UnitPrice*Quantity and finding the oldest order of said item to calculate the TimeSpan
-	 *   	-Storefront Table to get the current Storefront's location
-	 *   	-Supplier Table to get all the Suppliers within a certain distance to this Storefront sorted in order of 
-	 *   		highest discount to lowest discount and then from closest to farthest.
-	 *   	-Update the StockOrder Table with the new StockOrder
-	 *   	-Update StoreStocksItems Table to fit with the data from the StockOrder.
-	 *   	-Update Storefront Table to reflect the new funds
-	 *
-	 * @param ShopID
-	 */
-	private void doShopRestock(String ShopID) {
-		//DEBUG CODE START
-		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
-		if (Math.random() < 0.1) Main.updateQueue.add(timeStamp + " Restocked the Shop: " + ShopID);
-		//DEBUG CODE END
-	}
+//	/**
+//	 * TODO randomly decides whether or not the Storefront should restock with higher bias
+//	 * when Inventory is lower. If so, determines which items to stock by choosing with bias
+//	 * for Items bought recently that have a high AVG(Profit/TimeSpan). Also Biased toward Suppliers
+//	 *  that are closer to the Storefront and with higher discounts.
+//	 *   This is calculated using queries to the: 
+//	 *   	-StoreStocksItems Table for counting size of inventory
+//	 *   	-BuyOrder Table for items within a recent Datetime for the particular ShopID 
+//	 *   		counting the total UnitPrice*Quantity and finding the oldest order of said item to calculate the TimeSpan
+//	 *   	-Storefront Table to get the current Storefront's location
+//	 *   	-Supplier Table to get all the Suppliers within a certain distance to this Storefront sorted in order of 
+//	 *   		highest discount to lowest discount and then from closest to farthest.
+//	 *   	-Update the StockOrder Table with the new StockOrder
+//	 *   	-Update StoreStocksItems Table to fit with the data from the StockOrder.
+//	 *   	-Update Storefront Table to reflect the new funds
+//	 *
+//	 * @param ShopID
+//	 */
+//	private void doShopRestock(String ShopID) {
+//		//DEBUG CODE START
+//		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
+//		if (Math.random() < 0.05) Main.updateQueue.add(timeStamp + " Restocked the Shop: " + ShopID);
+//		//DEBUG CODE END
+//	}
 
 	public void shutDown() {
 		this.shutDown = true;

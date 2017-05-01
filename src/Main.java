@@ -38,7 +38,7 @@ public class Main {
 	public static final Color BG_COLOR2 = new Color(33, 33, 33);//new Color(90, 90, 180);
 	public static final Color FIELD_COLOR = new Color(23, 23, 23);//new Color(150, 150, 250);
 	public static final Color MENU_BUTTON_COLOR = new Color(13, 13, 13);//new Color(50, 50, 150);
-	public static final Color TEXT_COLOR = new Color(220, 220, 220);
+	public static final Color TEXT_COLOR = new Color(220, 220, 220);//Color.BLACK;
 	public static final JLabel EMPTY_CELL = new JLabel();
 	public static final Font HEADER_FONT = new Font(null, Font.BOLD, 24);
 	public static final Font FIELD_FONT = new Font(Font.MONOSPACED, Font.BOLD, 18);
@@ -236,9 +236,10 @@ public class Main {
 	public static List<String> getServerList() {
 		// DEBUG CODE START
 		List<String> dummyList = new ArrayList<>();
-		for (int i = 1; i <= 7; i++) {
-			dummyList.add("Server" + i);
-		}
+		dummyList.add("Rose");
+//		for (int i = 1; i <= 7; i++) {
+//			dummyList.add("Server" + i);
+//		}
 		return dummyList;
 		// DEBUG CODE END
 	}
