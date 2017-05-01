@@ -52,15 +52,15 @@ public class SupplierAddPage implements GMMPage {
 		JPanel submitPanel = new JPanel();
 
 		// create Labels
-		JLabel nameLabel = new JLabel("*Name: ");
-		JLabel serverLabel = new JLabel("*Server: ");
-		JLabel locationLabelX = new JLabel("*Location: x=");
+		JLabel nameLabel = new JLabel(" *Name:   ");
+		JLabel serverLabel = new JLabel("   *Server: ");
+		JLabel locationLabelX = new JLabel(" *Location:  x=");
 		JLabel locationLabelY = new JLabel(" y=");
-		JLabel discountLabel = new JLabel(" Product Discount: ");
+		JLabel discountLabel = new JLabel(" Product Discount:  ");
 		JLabel afterDiscountLabel = new JLabel("%          ");
 
 		// create TextFields
-		this.name = new JTextField(26);
+		this.name = new JTextField(25);
 		this.server = new JComboBox<>();
 		this.locationX = new JTextField(8);
 		this.locationY = new JTextField(8);
@@ -78,7 +78,7 @@ public class SupplierAddPage implements GMMPage {
 		// populate ComboBoxes
 		List<String> tempArrList = Main.getServerList();
 		String[] modelArray = new String[tempArrList.size() + 1];
-		modelArray[0] = "                      ";
+		modelArray[0] = " ";
 		for (int i = 0; i < modelArray.length - 1; i++) {
 			modelArray[i + 1] = tempArrList.get(i);
 		}
@@ -256,6 +256,7 @@ public class SupplierAddPage implements GMMPage {
 		}
 		else if (!disc.isEmpty() && (Double.parseDouble(disc) < 0 || Double.parseDouble(disc) > 100)) {
 			JOptionPane.showMessageDialog(null, "Please enter a value between 0 and 100 for the discount.");
+			return false;
 		}
 		return true;
 	}

@@ -52,14 +52,14 @@ public class ShopAddPage implements GMMPage {
 		JPanel submitPanel = new JPanel();
 
 		// create Labels
-		JLabel nameLabel = new JLabel("*Name: ");
-		JLabel serverLabel = new JLabel("*Server: ");
-		JLabel locationLabelX = new JLabel("*Location: x=");
+		JLabel nameLabel = new JLabel(" *Name:   ");
+		JLabel serverLabel = new JLabel("   *Server: ");
+		JLabel locationLabelX = new JLabel(" *Location:  x=");
 		JLabel locationLabelY = new JLabel(" y=");
-		JLabel fundsLabel = new JLabel(" Current Funds:    ");
+		JLabel fundsLabel = new JLabel("  Current Funds:     ");
 
 		// create Fields
-		this.name = new JTextField(26);
+		this.name = new JTextField(25);
 		this.server = new JComboBox<>();
 		this.locationX = new JTextField(8);
 		this.locationY = new JTextField(8);
