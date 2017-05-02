@@ -194,7 +194,7 @@ public class SupplierAddPage implements GMMPage {
 	 */
 	public void addSupplier(String name, String server, double locX, double locY, double discount) {
 		try {
-			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addSupplier(?, ?, ?, ?, ?)}");
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addSupplier(?, ?, ?, ?, ?) }");
 
 			// Registering parameters in CallableStatement
 			proc.setString(2, name);
