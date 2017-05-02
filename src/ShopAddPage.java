@@ -191,7 +191,7 @@ public class ShopAddPage implements GMMPage {
 	public void addShop(String name, String server, double locX, double locY, double funds) {
 		try {
 			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addStorefront(?, ?, ?, ?, ?, ?) }");
-
+			System.out.println(server);
 			// Registering parameters in the CallableStatement to fill values
 			proc.setString(2, name);
 			proc.setString(3, server);
@@ -216,7 +216,6 @@ public class ShopAddPage implements GMMPage {
 				
 				//update loaded list
 				Main.shopList.add(name);
-				
 				// blank out fields after success
 				this.name.setText("");
 				this.server.setSelectedIndex(0);

@@ -69,8 +69,8 @@ public class Game {
 				proc.setString(3, Main.MerchantID);
 				proc.registerOutParameter(4, Types.VARCHAR);
 				proc.registerOutParameter(5, Types.INTEGER);
-				proc.registerOutParameter(6, Types.CHAR);
-				proc.registerOutParameter(7, Types.CHAR);
+				proc.registerOutParameter(6, Types.VARCHAR);
+				proc.registerOutParameter(7, Types.VARCHAR);
 				proc.execute();
 				int returnVal = proc.getInt(1);
 
@@ -79,8 +79,8 @@ public class Game {
 					this.chatlog.add(timeStamp + " " + 
 								proc.getString(4) + " just bought " + 
 								proc.getInt(5) + " " + 
-								proc.getString(6).trim() + " from " + 
-								proc.getString(7).trim() + "!");
+								proc.getString(6) + " from " + 
+								proc.getString(7) + "!");
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "Player BuyOrder failed. Error code is: " + returnVal);
