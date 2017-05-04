@@ -74,13 +74,20 @@ public class Game {
 				proc.execute();
 				int returnVal = proc.getInt(1);
 
+				String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
 				if (returnVal == 0) {
-					String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
 					this.chatlog.add(timeStamp + " " + 
 								proc.getString(4) + " just bought " + 
 								proc.getInt(5) + " " + 
 								proc.getString(6) + " from " + 
 								proc.getString(7) + "!");
+				}
+				else if (returnVal == 1) {
+					this.chatlog.add(timeStamp + " " + 
+								proc.getString(4) + " wanted " + 
+								proc.getInt(5) + " " + 
+								proc.getString(6) + " from " + 
+								proc.getString(7) + ", but there was not enough in stock!");
 				}
 				else {
 					JOptionPane.showMessageDialog(null, "Player BuyOrder failed. Error code is: " + returnVal);

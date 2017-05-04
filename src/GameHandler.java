@@ -66,6 +66,15 @@ public class GameHandler implements Runnable {
 				Main.updateQueue.add(chatline);
 			}
 		}
+		else if (!valid && playerName.contains(" wanted ")) {
+			String[] ajbArr = playerName.split(" wanted ");
+			ajbArr = ajbArr[ajbArr.length-1].split(", ");
+			String ajb = ajbArr[ajbArr.length-1];
+			if (ajb.equals("but there was not enough in stock!")){
+				//Its a buy order restock reccomend message
+				Main.updateQueue.add(chatline);
+			}
+		}
 //		System.out.println(chatline);
 	}
 

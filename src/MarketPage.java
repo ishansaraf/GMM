@@ -85,6 +85,12 @@ public class MarketPage implements GMMPage{
 			Main.curPage = this;
 			Main.mainframe.revalidate();
 			Main.mainframe.repaint();
+			
+			this.shopListModel = new DefaultListModel<>();
+			for (String ShopID : Main.getShopList()) {
+				this.shopListModel.addElement(ShopID);
+			}
+			
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
 		}
