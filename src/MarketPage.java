@@ -26,8 +26,6 @@ import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
@@ -157,9 +155,11 @@ public class MarketPage implements GMMPage{
 		//create the shopList Listbox for displaying updates
 		this.shopListModel = new DefaultListModel<>();
 		this.shopList = new JList<>(this.shopListModel);
+		
 		ListSelectionModel lsm = this.shopList.getSelectionModel();
 		lsm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lsm.addListSelectionListener(new ShopListListener());
+		
 		this.shopList.setBackground(Main.BG_COLOR);
 		this.shopList.setForeground(Main.TEXT_COLOR);
 		this.shopList.setCellRenderer(new CSCListCellRenderer(Main.FIELD_COLOR));
@@ -255,6 +255,7 @@ public class MarketPage implements GMMPage{
 			for (String ShopID : Main.getShopList()) {
 				this.shopListModel.addElement(ShopID);
 			}
+			this.shopList.setModel(this.shopListModel);
 			
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
@@ -332,11 +333,13 @@ public class MarketPage implements GMMPage{
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			try {
-				refresh();
-			} catch (SQLException e1) {
-				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
-			}			
+			if (!e.getValueIsAdjusting()){
+				try {
+					refresh();
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+				}
+			}
 		}
 		
 	}

@@ -1,3 +1,6 @@
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -62,7 +65,7 @@ public class GameHandler implements Runnable {
 			String ajb = playerName.split(" just bought ")[1];
 			if (ajb.contains(" from ") && ajb.charAt(ajb.length()-1) == '!'){
 				//Its a buy order
-				this.sendBuyOrder(chatline);
+				this.sendBuyOrder(noTimeLine);
 				Main.updateQueue.add(chatline);
 			}
 		}
@@ -80,13 +83,89 @@ public class GameHandler implements Runnable {
 
 	private boolean isValidPlayer(String playerName) {
 		// TODO create stored proc for checking if the playerName is valid
-		// REMEMBER TO SANITIZE INPUT
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidPlayer(?)}");
+			proc.setString(2, playerName);
+			proc.registerOutParameter(1, Types.BOOLEAN);
+			proc.execute();
+			return proc.getBoolean(1);
+		}
+		catch (SQLException exception) {exception.printStackTrace();}
+		return false;
+	}
+	
+	private boolean isValidItem(String itemName) {
+		// TODO create stored proc for checking if the itemName is valid
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidItem(?)}");
+			proc.setString(2, itemName);
+			proc.registerOutParameter(1, Types.BOOLEAN);
+			proc.execute();
+			return proc.getBoolean(1);
+		}
+		catch (SQLException exception) {exception.printStackTrace();}
+		return false;
+	}
+	
+	private boolean isValidShop(String shopName) {
+		// TODO create stored proc for checking if the shopName is valid
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidShop(?)}");
+			proc.setString(2, shopName);
+			proc.registerOutParameter(1, Types.BOOLEAN);
+			proc.execute();
+			return proc.getBoolean(1);
+		}
+		catch (SQLException exception) {exception.printStackTrace();}
 		return false;
 	}
 
 	private void sendBuyOrder(String chatline) {
-		// TODO greate stored proc for sending in buy orders
-//		System.out.println(chatline + " buyOrder to be placed");
+		// TODO create stored proc for sending in buy orders
+		String[] firstSplit = chatline.split(" just bought ");
+		String player = firstSplit[0];
+		String withoutPlayer = chatline.substring(player.length()+13);
+		String quantityS = withoutPlayer.split(" ")[0];
+		int quantity = Integer.parseInt(quantityS);
+		String withoutQuantity = withoutPlayer.substring(quantityS.length() + 1);
+		String[] secondSplit = withoutQuantity.split(" from ");
+		String item = secondSplit[0];
+		String withoutItem = withoutQuantity.substring(item.length() + 6);
+		//if some item (or shop) has " from " in its name -_-
+		if (secondSplit.length > 2) {
+			StringBuilder itemBuilder = new StringBuilder();
+			for (int i = 0; i < secondSplit.length-1; i++) {
+				itemBuilder.append(secondSplit[i]);
+				if(isValidItem(itemBuilder.toString())) {
+					item = itemBuilder.toString();
+					withoutItem = withoutQuantity.substring(item.length() + 6);
+				}
+			}
+		}
+		String shop = withoutItem.substring(0, withoutItem.length()-1);
+		
+		//now that we have the data we can actually add the buy order:
+//		try {
+//			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addBuyOrder(?, ?, ?, ?) }");//TODO: add stored proc
+//
+//			// Registering parameters in CallableStatement
+//			proc.setString(2, player);
+//			proc.setInt(3, quantity);
+//			proc.setString(4, item);
+//			proc.setString(5, shop);
+//			proc.registerOutParameter(1, Types.INTEGER);
+//			proc.execute();
+//
+//			int returnVal = proc.getInt(1);
+//
+//			// Checking that buyOrder add was successful
+//			if (returnVal != 0) {
+//				JOptionPane.showMessageDialog(null, 
+//						"there was a problem registering a buy order in the database. Error code is: " + returnVal);
+//			}
+//		} catch (Exception e) {
+//			e.printStackTrace();
+//		}
 	}
 
 //	/**

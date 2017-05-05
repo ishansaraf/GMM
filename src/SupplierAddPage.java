@@ -166,7 +166,7 @@ public class SupplierAddPage implements GMMPage {
 
 	@Override
 	public void shutDown() {
-		// TODO Auto-generated method stub.
+		// nothing special
 
 	}
 

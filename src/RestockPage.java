@@ -41,6 +41,7 @@ public class RestockPage implements GMMPage {
 		JPanel supplierPanel = new JPanel();
 		JPanel ordersPanel = new JPanel();
 		JPanel submitPanel = new JPanel();
+		JPanel headerPanel = new JPanel();
 
 		//create Labels
 		JLabel shopLabel = new JLabel("*Shop:     ");
@@ -110,10 +111,11 @@ public class RestockPage implements GMMPage {
 		ordersPanel.add(ordersScrollPane);
 		submitPanel.add(submitButton);
 		this.centerPanel.setLayout(new BoxLayout(this.centerPanel, BoxLayout.PAGE_AXIS));
-		JLabel header = new JLabel("               Restock a Store", SwingConstants.CENTER);
+		JLabel header = new JLabel("   Restock a Store", SwingConstants.CENTER);
 		header.setFont(Main.HEADER_FONT);
 		header.setForeground(Main.TEXT_COLOR);
-		this.centerPanel.add(header);
+		headerPanel.add(header);
+		this.centerPanel.add(headerPanel);
 		this.centerPanel.add(shopPanel);
 		this.centerPanel.add(supplierPanel);
 		this.centerPanel.add(ordersHeaderLabel);
@@ -126,6 +128,7 @@ public class RestockPage implements GMMPage {
 		supplierPanel.setBackground(Main.BG_COLOR);
 		ordersPanel.setBackground(Main.BG_COLOR);
 		submitPanel.setBackground(Main.BG_COLOR);
+		headerPanel.setBackground(Main.BG_COLOR);
 		this.Orders.setBackground(Main.BG_COLOR);
 		this.Shop.setBackground(Main.FIELD_COLOR);
 		this.Supplier.setBackground(Main.FIELD_COLOR);
@@ -223,7 +226,7 @@ public class RestockPage implements GMMPage {
 
 	@Override
 	public void shutDown() {
-		// TODO Auto-generated method stub.
+		// nothing special
 
 	}
 
