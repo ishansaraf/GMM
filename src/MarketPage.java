@@ -4,17 +4,25 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.CallableStatement;
+import java.sql.ResultSet;
+import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.table.JTableHeader;
 /**
  * 
  * Page for market data viewing
@@ -24,13 +32,15 @@ import javax.swing.event.ListSelectionListener;
  */
 public class MarketPage implements GMMPage{
 
-	JPanel eastPanel;
+	JScrollPane eastPanel;
 	DefaultListModel<String> updateListModel;
 	JList<String> updateFeed;
 	JScrollPane updateScrollFeed;
 	DefaultListModel<String> shopListModel;
 	JList<String> shopList;
 	JScrollPane shopScrollList;
+	JTable table;
+	JScrollPane shopDisplayScroll;
 	Thread dataUpdater;
 	Thread gameThread;
 	private Updater updater;
@@ -43,7 +53,11 @@ public class MarketPage implements GMMPage{
 		@Override
 		public void actionPerformed(ActionEvent e) {
 			// refreshes current shop displayed
-			refresh();
+			try {
+				refresh();
+			} catch (SQLException e1) {
+				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+			}	
 		}
 	}
 	
@@ -51,19 +65,47 @@ public class MarketPage implements GMMPage{
 		this.atBottomOnUnshow = false;
 		
 		//create panels
-		this.eastPanel = new JPanel();
-		
-		//set BG colors
-		this.eastPanel.setBackground(Main.BG_COLOR2);
+		JPanel displayPanel = new JPanel();
+		displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
+		this.eastPanel = new JScrollPane(displayPanel);
+		this.eastPanel.setViewportView(displayPanel);
+		this.eastPanel.getViewport().setBackground(Main.BG_COLOR2);
+		this.eastPanel.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
+		this.eastPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
-		//add refresh button
+		//panel with refresh button
 		JButton refresh = new MenuButton("Refresh", new RefreshListener());
 		JPanel topPanel = new JPanel();
-		this.eastPanel.add(topPanel, BorderLayout.NORTH);
-
+		displayPanel.add(topPanel);
 		topPanel.add(refresh);
-		refresh.setFont(Main.FIELD_FONT);
+		
+		//add shop display
+		JPanel tablePanel = new JPanel();
+		this.table = new JTable();
+		tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
+		JTableHeader header = this.table.getTableHeader();
+		tablePanel.add(header);
+		tablePanel.add(this.table);
+		displayPanel.add(tablePanel);
+		
+		//set table properties
+		this.table.setRowHeight(20);
+		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.table.setShowHorizontalLines(false);
+		this.table.setShowVerticalLines(false);
+		
+		//set colors and font
+		displayPanel.setBackground(Main.BG_COLOR2);
+		tablePanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
+		header.setBackground(Main.BG_COLOR2);
+		header.setForeground(Main.TEXT_COLOR);
+		header.setFont(Main.FIELD_FONT);
+		this.table.setBackground(Main.BG_COLOR2);
+		this.table.setForeground(Main.TEXT_COLOR);
+		this.table.setFont(Main.FIELD_FONT);
+		refresh.setFont(Main.FIELD_FONT);
+		
 		
 		//create the updateFeed Listbox for displaying updates
 		this.updateListModel = new DefaultListModel<>();
@@ -158,16 +200,28 @@ public class MarketPage implements GMMPage{
 		System.out.println("MarketPage Unloaded");
 	}
 	
-	public void refresh() {
+	public void refresh() throws SQLException {
 		String shopName = this.shopList.getSelectedValue();
-		
+		CallableStatement cs = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
+		cs.setString(1, shopName);
+		cs.setString(2, Main.MerchantID);
+		ResultSet rs = cs.executeQuery();
+		String[] names = {"Item", "Quantity", "Player", "Order Time"};
+		TopOrdersTableModel model = new TopOrdersTableModel(rs, names);
+		this.table.setModel(model);
+//		this.test.setText(shopName + " " + count);
+//		count++;
 	}
 	
 	class ShopListListener implements ListSelectionListener {
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			refresh();			
+			try {
+				refresh();
+			} catch (SQLException e1) {
+				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+			}			
 		}
 		
 	}
