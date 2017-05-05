@@ -126,7 +126,7 @@ public class GameHandler implements Runnable {
 		String player = firstSplit[0];
 		String withoutPlayer = chatline.substring(player.length()+13);
 		String quantityS = withoutPlayer.split(" ")[0];
-		double quantity = Double.parseDouble(quantityS);
+		int quantity = Integer.parseInt(quantityS);
 		String withoutQuantity = withoutPlayer.substring(quantityS.length() + 1);
 		String[] secondSplit = withoutQuantity.split(" from ");
 		String item = secondSplit[0];
@@ -150,7 +150,7 @@ public class GameHandler implements Runnable {
 //
 //			// Registering parameters in CallableStatement
 //			proc.setString(2, player);
-//			proc.setDouble(3, quantity);
+//			proc.setInt(3, quantity);
 //			proc.setString(4, item);
 //			proc.setString(5, shop);
 //			proc.registerOutParameter(1, Types.INTEGER);

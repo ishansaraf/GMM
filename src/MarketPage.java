@@ -19,8 +19,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
-import javax.swing.border.Border;
-import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
@@ -188,6 +186,7 @@ public class MarketPage implements GMMPage{
 			for (String ShopID : Main.getShopList()) {
 				this.shopListModel.addElement(ShopID);
 			}
+			this.shopList.setModel(this.shopListModel);
 			
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
