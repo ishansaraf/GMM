@@ -40,6 +40,7 @@ import javax.swing.table.TableColumnModel;
 public class MarketPage implements GMMPage{
 
 	JScrollPane eastPanel;
+	JButton refresh;
 	DefaultListModel<String> updateListModel;
 	JList<String> updateFeed;
 	JScrollPane updateScrollFeed;
@@ -85,10 +86,11 @@ public class MarketPage implements GMMPage{
 		this.eastPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//panel with refresh button
-		JButton refresh = new MenuButton("Refresh", new RefreshListener());
+		this.refresh = new MenuButton("Refresh", new RefreshListener());
+		this.refresh.setVisible(false);
 		JPanel topPanel = new JPanel();
 		displayPanel.add(topPanel);
-		topPanel.add(refresh);
+		topPanel.add(this.refresh);
 		
 		//add orders table
 		JPanel orderPanel = new JPanel();
@@ -152,7 +154,7 @@ public class MarketPage implements GMMPage{
 		this.itemsTable.setBackground(Main.BG_COLOR2);
 		this.itemsTable.setForeground(Main.TEXT_COLOR);
 		this.itemsTable.setFont(Main.TABLE_FONT);
-		refresh.setFont(Main.FIELD_FONT);
+		this.refresh.setFont(Main.FIELD_FONT);
 		
 		
 		//create the updateFeed Listbox for displaying updates
@@ -237,7 +239,7 @@ public class MarketPage implements GMMPage{
 	}
 	
 	public void search() {
-		String text = this.search.getText().trim();
+		String text = this.search.getText().trim().toLowerCase();
 		this.shopListModel = new DefaultListModel<>();
 		if (text.equals("") || text.equals("*")) {
 			for (String ShopID : Main.getShopList()) {
@@ -245,7 +247,7 @@ public class MarketPage implements GMMPage{
 			}
 		} else {
 			for (String ShopID : Main.getShopList()) {
-				if (ShopID.contains(text)) {
+				if (ShopID.toLowerCase().contains(text)) {
 					this.shopListModel.addElement(ShopID);
 				}
 			}
@@ -269,7 +271,8 @@ public class MarketPage implements GMMPage{
 				this.shopListModel.addElement(ShopID);
 			}
 			this.shopList.setModel(this.shopListModel);
-			
+
+			this.refresh.setVisible(false);
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
 		}
@@ -310,6 +313,7 @@ public class MarketPage implements GMMPage{
 	}
 	
 	public void refresh() throws SQLException {
+		this.refresh.setVisible(true);
 		this.ordersLabel.setVisible(false);
 		this.itemsLabel.setVisible(false);
 		this.ordersTable.setVisible(false);
@@ -363,6 +367,7 @@ public class MarketPage implements GMMPage{
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()){
 				try {
+					
 					refresh();
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
