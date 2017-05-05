@@ -60,7 +60,7 @@ public class Game {
 //			popularity = proc.getDouble(1);
 //		}
 //		catch (SQLException exception) {exception.printStackTrace();}
-		if (Math.random() < 0.3) {//popularity) {
+		if (Math.random() < 0.1) {//popularity) {
 			try {
 				//call statement
 				CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.PlayerOrdersItem(?, ?, ?, ?, ?, ?) }");
@@ -90,7 +90,7 @@ public class Game {
 								proc.getString(7) + ", but there was not enough in stock!");
 				}
 				else {
-					JOptionPane.showMessageDialog(null, "Player BuyOrder failed. Error code is: " + returnVal);
+					JOptionPane.showMessageDialog(null, "Player PlayerOrdersItem failed. Error code is: " + returnVal);
 				}
 //					Main.updateQueue.add(timeStamp + " did a Player Interaction for PlayerID: " + PlayerID);
 			} 

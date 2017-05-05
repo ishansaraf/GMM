@@ -4,6 +4,8 @@ import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.swing.JOptionPane;
+
 /**
  * 
  * Handles interfacing with the Game, and excecuting client side logic
@@ -122,6 +124,7 @@ public class GameHandler implements Runnable {
 
 	private void sendBuyOrder(String chatline) {
 		// TODO create stored proc for sending in buy orders
+		System.out.println(chatline);
 		String[] firstSplit = chatline.split(" just bought ");
 		String player = firstSplit[0];
 		String withoutPlayer = chatline.substring(player.length()+13);
@@ -143,29 +146,32 @@ public class GameHandler implements Runnable {
 			}
 		}
 		String shop = withoutItem.substring(0, withoutItem.length()-1);
-		
 		//now that we have the data we can actually add the buy order:
-//		try {
-//			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addBuyOrder(?, ?, ?, ?) }");//TODO: add stored proc
-//
-//			// Registering parameters in CallableStatement
-//			proc.setString(2, player);
-//			proc.setInt(3, quantity);
-//			proc.setString(4, item);
-//			proc.setString(5, shop);
-//			proc.registerOutParameter(1, Types.INTEGER);
-//			proc.execute();
-//
-//			int returnVal = proc.getInt(1);
-//
-//			// Checking that buyOrder add was successful
-//			if (returnVal != 0) {
-//				JOptionPane.showMessageDialog(null, 
-//						"there was a problem registering a buy order in the database. Error code is: " + returnVal);
-//			}
-//		} catch (Exception e) {
-//			e.printStackTrace();
-//		}
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addBuyOrder(?, ?, ?, ?) }");
+
+			// Registering parameters in CallableStatement
+			proc.setString(2, player);
+			proc.setInt(3, quantity);
+			proc.setString(4, item);
+			proc.setString(5, shop);
+			proc.registerOutParameter(1, Types.INTEGER);
+			proc.execute();
+
+			int returnVal = proc.getInt(1);
+
+			// Checking that buyOrder add was successful
+			if (returnVal != 0) {
+				JOptionPane.showMessageDialog(null, 
+						"there was a problem registering a buy order in the database. Error code is: " + returnVal);
+				JOptionPane.showMessageDialog(null, "Player: " + player + 
+											"\n Quantity: " + quantity + 
+											"\n Item: " + item +
+											"\n Shop: " + shop);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 //	/**
