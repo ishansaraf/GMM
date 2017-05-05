@@ -1,7 +1,6 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.sql.CallableStatement;
@@ -17,7 +16,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
@@ -123,9 +121,11 @@ public class MarketPage implements GMMPage{
 		//create the shopList Listbox for displaying updates
 		this.shopListModel = new DefaultListModel<>();
 		this.shopList = new JList<>(this.shopListModel);
+		
 		ListSelectionModel lsm = this.shopList.getSelectionModel();
 		lsm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
 		lsm.addListSelectionListener(new ShopListListener());
+		
 		this.shopList.setBackground(Main.BG_COLOR);
 		this.shopList.setForeground(Main.TEXT_COLOR);
 		this.shopList.setCellRenderer(new CSCListCellRenderer(Main.FIELD_COLOR));
@@ -217,11 +217,13 @@ public class MarketPage implements GMMPage{
 
 		@Override
 		public void valueChanged(ListSelectionEvent e) {
-			try {
-				refresh();
-			} catch (SQLException e1) {
-				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
-			}			
+			if (!e.getValueIsAdjusting()){
+				try {
+					refresh();
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+				}
+			}
 		}
 		
 	}
