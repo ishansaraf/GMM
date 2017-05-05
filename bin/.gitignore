@@ -4,3 +4,5 @@
 /TableModel.class
 /TopOrdersTableModel.class
 /TopOrdersTableModel$Order.class
+/ShopItemsTableModel.class
+/ShopItemsTableModel$Item.class
