@@ -45,15 +45,12 @@ public class GameHandler implements Runnable {
 	 *
 	 */
 	private void pollforUpdates() {
+		this.game.update();
 		while(true) {
 			String chatline = this.game.nextChatLine();
 			if (chatline == null) break;
 			this.parseChatLine(chatline);
 		}
-		
-		
-		
-		this.game.update();
 	}
 
 	private void parseChatLine(String chatline) {
