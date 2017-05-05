@@ -8,6 +8,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 
 import javax.swing.BorderFactory;
+import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
@@ -18,6 +19,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
@@ -37,7 +40,8 @@ public class MarketPage implements GMMPage{
 	DefaultListModel<String> shopListModel;
 	JList<String> shopList;
 	JScrollPane shopScrollList;
-	JTable table;
+	JTable ordersTable;
+	JTable itemsTable;
 	JScrollPane shopDisplayScroll;
 	Thread dataUpdater;
 	Thread gameThread;
@@ -77,31 +81,55 @@ public class MarketPage implements GMMPage{
 		displayPanel.add(topPanel);
 		topPanel.add(refresh);
 		
-		//add shop display
-		JPanel tablePanel = new JPanel();
-		this.table = new JTable();
-		tablePanel.setLayout(new BoxLayout(tablePanel, BoxLayout.Y_AXIS));
-		JTableHeader header = this.table.getTableHeader();
-		tablePanel.add(header);
-		tablePanel.add(this.table);
-		displayPanel.add(tablePanel);
+		//add orders table
+		JPanel orderPanel = new JPanel();
+		orderPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		this.ordersTable = new JTable();
+		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
+		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
+		orderPanel.add(ordersHeader);
+		orderPanel.add(this.ordersTable);
+		displayPanel.add(orderPanel);
+		
+		//add items table
+		JPanel itemPanel = new JPanel();
+		itemPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		this.itemsTable = new JTable();
+		itemPanel.setLayout(new BoxLayout(itemPanel, BoxLayout.Y_AXIS));
+		JTableHeader itemsHeader = this.itemsTable.getTableHeader();
+		itemPanel.add(itemsHeader);
+		itemPanel.add(this.itemsTable);
+		displayPanel.add(itemPanel);
+		
+		displayPanel.add(Box.createVerticalGlue());
 		
 		//set table properties
-		this.table.setRowHeight(20);
-		this.table.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
-		this.table.setShowHorizontalLines(false);
-		this.table.setShowVerticalLines(false);
+		this.ordersTable.setRowHeight(20);
+		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.ordersTable.setShowHorizontalLines(false);
+		this.ordersTable.setShowVerticalLines(false);
+		this.itemsTable.setRowHeight(20);
+		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.itemsTable.setShowHorizontalLines(false);
+		this.itemsTable.setShowVerticalLines(false);
+		
 		
 		//set colors and font
 		displayPanel.setBackground(Main.BG_COLOR2);
-		tablePanel.setBackground(Main.BG_COLOR2);
+		orderPanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
-		header.setBackground(Main.BG_COLOR2);
-		header.setForeground(Main.TEXT_COLOR);
-		header.setFont(Main.FIELD_FONT);
-		this.table.setBackground(Main.BG_COLOR2);
-		this.table.setForeground(Main.TEXT_COLOR);
-		this.table.setFont(Main.FIELD_FONT);
+		ordersHeader.setBackground(Main.BG_COLOR2);
+		ordersHeader.setForeground(Main.TEXT_COLOR);
+		ordersHeader.setFont(Main.FIELD_FONT);
+		itemsHeader.setBackground(Main.BG_COLOR2);
+		itemsHeader.setForeground(Main.TEXT_COLOR);
+		itemsHeader.setFont(Main.FIELD_FONT);
+		this.ordersTable.setBackground(Main.BG_COLOR2);
+		this.ordersTable.setForeground(Main.TEXT_COLOR);
+		this.ordersTable.setFont(Main.FIELD_FONT);
+		this.itemsTable.setBackground(Main.BG_COLOR2);
+		this.itemsTable.setForeground(Main.TEXT_COLOR);
+		this.itemsTable.setFont(Main.FIELD_FONT);
 		refresh.setFont(Main.FIELD_FONT);
 		
 		
@@ -202,13 +230,20 @@ public class MarketPage implements GMMPage{
 	
 	public void refresh() throws SQLException {
 		String shopName = this.shopList.getSelectedValue();
-		CallableStatement cs = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
-		cs.setString(1, shopName);
-		cs.setString(2, Main.MerchantID);
-		ResultSet rs = cs.executeQuery();
-		String[] names = {"Item", "Quantity", "Player", "Order Time"};
-		TopOrdersTableModel model = new TopOrdersTableModel(rs, names);
-		this.table.setModel(model);
+		CallableStatement cs1 = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
+		cs1.setString(1, shopName);
+		cs1.setString(2, Main.MerchantID);
+		ResultSet ors = cs1.executeQuery();
+		String[] orderNames = {"Item", "Quantity", "Player", "Order Time"};
+		TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
+		this.ordersTable.setModel(ordersModel);
+		String[] itemNames = {"Item", "Quantity", "Unit Price"};
+		CallableStatement cs2 = Main.conn.prepareCall("{call getShopItems(?, ?)}");
+		cs2.setString(1, shopName);
+		cs2.setString(2, Main.MerchantID);
+		ResultSet irs = cs2.executeQuery();
+		ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames);
+		this.itemsTable.setModel(itemsModel);
 //		this.test.setText(shopName + " " + count);
 //		count++;
 	}
