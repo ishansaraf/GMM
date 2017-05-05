@@ -2,8 +2,12 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.KeyEvent;
+import java.awt.event.KeyListener;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -19,6 +23,7 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
 import javax.swing.JTextArea;
+import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
 import javax.swing.border.Border;
@@ -41,6 +46,7 @@ public class MarketPage implements GMMPage{
 	JScrollPane updateScrollFeed;
 	DefaultListModel<String> shopListModel;
 	JList<String> shopList;
+	JTextField search;
 	JScrollPane shopScrollList;
 	JTable ordersTable;
 	JTable itemsTable;
@@ -107,11 +113,11 @@ public class MarketPage implements GMMPage{
 		
 		//set table properties
 		this.ordersTable.setRowHeight(20);
-		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.ordersTable.setShowHorizontalLines(false);
 		this.ordersTable.setShowVerticalLines(false);
 		this.itemsTable.setRowHeight(20);
-		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.itemsTable.setShowHorizontalLines(false);
 		this.itemsTable.setShowVerticalLines(false);
 		
@@ -162,8 +168,53 @@ public class MarketPage implements GMMPage{
 		}
 		
 		//put the shopList into a JScrollPane for scrolling
-		this.shopScrollList = new JScrollPane(this.shopList);
-		this.shopScrollList.setViewportView(this.shopList);
+		JPanel shopsPanel = new JPanel();
+		this.search = new JTextField();
+		this.search.addKeyListener(new KeyListener() {
+
+			@Override
+			public void keyPressed(KeyEvent e) {
+				if (e.getKeyCode()==KeyEvent.VK_ENTER) {
+					search();
+				}
+			}
+
+			@Override
+			public void keyReleased(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+
+			@Override
+			public void keyTyped(KeyEvent arg0) {
+				// TODO Auto-generated method stub
+				
+			}
+			
+		});
+		shopsPanel.setLayout(new GridBagLayout());
+		GridBagConstraints c = new GridBagConstraints();
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.gridwidth = 3;
+		c.gridx = 0;
+		c.gridy = 0;
+		c.weightx = 1;
+		shopsPanel.add(this.search, c);
+		c.fill = GridBagConstraints.HORIZONTAL;
+		c.anchor = GridBagConstraints.LINE_START;
+		c.gridx = 0;
+		c.gridy = 1;
+		c.gridwidth = 3;
+		shopsPanel.add(this.shopList, c);
+		c.weighty = 1;
+		c.gridy = 2;
+		JPanel filler = new JPanel();
+		filler.setBackground(Main.BG_COLOR);
+		shopsPanel.add(filler, c);
+		shopsPanel.setBackground(Main.BG_COLOR);
+		this.shopScrollList = new JScrollPane(shopsPanel);
+		this.shopScrollList.setViewportView(shopsPanel);
 		this.shopScrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		//set prefererred sizes
@@ -171,6 +222,22 @@ public class MarketPage implements GMMPage{
 		this.shopScrollList.setPreferredSize(new Dimension(295, 0));
 		
 		kickOffUpdateThreads();
+	}
+	
+	public void search() {
+		String text = this.search.getText().trim();
+		this.shopListModel = new DefaultListModel<>();
+		if (text.equals("") || text.equals("*")) {
+			for (String ShopID : Main.getShopList()) {
+				this.shopListModel.addElement(ShopID);
+			}
+		} else {
+			for (String ShopID : Main.getShopList()) {
+				if (ShopID.contains(text)) {
+					this.shopListModel.addElement(ShopID);
+				}
+			}
+		}
 	}
 	
 	@Override
@@ -229,21 +296,34 @@ public class MarketPage implements GMMPage{
 	}
 	
 	public void refresh() throws SQLException {
+		this.ordersTable.setVisible(false);
+		this.ordersTable.getTableHeader().setVisible(false);
+		this.itemsTable.setVisible(false);
+		this.itemsTable.getTableHeader().setVisible(false);
 		String shopName = this.shopList.getSelectedValue();
 		CallableStatement cs1 = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
 		cs1.setString(1, shopName);
 		cs1.setString(2, Main.MerchantID);
 		ResultSet ors = cs1.executeQuery();
-		String[] orderNames = {"Item", "Quantity", "Player", "Order Time"};
-		TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
-		this.ordersTable.setModel(ordersModel);
-		String[] itemNames = {"Item", "Quantity", "Unit Price"};
+		if (ors.isBeforeFirst()) {
+			this.ordersTable.setVisible(true);
+			this.ordersTable.getTableHeader().setVisible(true);
+			String[] orderNames = {"Item", "Quantity", "Player", "Order Time"};
+			TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
+			this.ordersTable.setModel(ordersModel);
+		}
+		
 		CallableStatement cs2 = Main.conn.prepareCall("{call getShopItems(?, ?)}");
 		cs2.setString(1, shopName);
 		cs2.setString(2, Main.MerchantID);
 		ResultSet irs = cs2.executeQuery();
-		ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames);
-		this.itemsTable.setModel(itemsModel);
+		if (irs.isBeforeFirst()) {
+			this.itemsTable.setVisible(true);
+			this.itemsTable.getTableHeader().setVisible(true);
+			String[] itemNames = {"Item", "Quantity", "Unit Price"};
+			ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames);
+			this.itemsTable.setModel(itemsModel);
+		}
 //		this.test.setText(shopName + " " + count);
 //		count++;
 	}
