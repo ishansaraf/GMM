@@ -1,13 +1,20 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 
 import javax.swing.BorderFactory;
 import javax.swing.DefaultListModel;
+import javax.swing.JButton;
 import javax.swing.JList;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 /**
  * 
  * Page for market data viewing
@@ -29,6 +36,16 @@ public class MarketPage implements GMMPage{
 	private Updater updater;
 	private GameHandler gameHandler;
 	boolean atBottomOnUnshow;
+	int count = 0;
+	
+	public class RefreshListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			// refreshes current shop displayed
+			refresh();
+		}
+	}
 	
 	public MarketPage() {
 		this.atBottomOnUnshow = false;
@@ -39,6 +56,14 @@ public class MarketPage implements GMMPage{
 		//set BG colors
 		this.eastPanel.setBackground(Main.BG_COLOR2);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+		//add refresh button
+		JButton refresh = new MenuButton("Refresh", new RefreshListener());
+		JPanel topPanel = new JPanel();
+		this.eastPanel.add(topPanel, BorderLayout.NORTH);
+
+		topPanel.add(refresh);
+		refresh.setFont(Main.FIELD_FONT);
+		topPanel.setBackground(Main.BG_COLOR2);
 		
 		//create the updateFeed Listbox for displaying updates
 		this.updateListModel = new DefaultListModel<>();
@@ -56,6 +81,9 @@ public class MarketPage implements GMMPage{
 		//create the shopList Listbox for displaying updates
 		this.shopListModel = new DefaultListModel<>();
 		this.shopList = new JList<>(this.shopListModel);
+		ListSelectionModel lsm = this.shopList.getSelectionModel();
+		lsm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+		lsm.addListSelectionListener(new ShopListListener());
 		this.shopList.setBackground(Main.BG_COLOR);
 		this.shopList.setForeground(Main.TEXT_COLOR);
 		this.shopList.setCellRenderer(new CSCListCellRenderer(Main.FIELD_COLOR));
@@ -128,6 +156,20 @@ public class MarketPage implements GMMPage{
 		if (this.shopScrollList != null) Main.mainframe.remove(this.shopScrollList);
 		if (this.updateScrollFeed != null) Main.mainframe.remove(this.updateScrollFeed);
 		System.out.println("MarketPage Unloaded");
+	}
+	
+	public void refresh() {
+		String shopName = this.shopList.getSelectedValue();
+		
+	}
+	
+	class ShopListListener implements ListSelectionListener {
+
+		@Override
+		public void valueChanged(ListSelectionEvent e) {
+			refresh();			
+		}
+		
 	}
 	
 }
