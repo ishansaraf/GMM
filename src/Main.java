@@ -183,7 +183,7 @@ public class Main {
 
 		// construct menuBar
 		menuBar = new JPanel();
-		menuBar.setLayout(new GridLayout(0, 5));
+		menuBar.setLayout(new GridLayout(0, 6));
 		menuBar.setBackground(Color.GRAY);
 		menuBar.setPreferredSize(new Dimension(900, 30));
 		mainframe.add(menuBar, BorderLayout.NORTH);
@@ -193,12 +193,14 @@ public class Main {
 		GMMPage addShopPage = new ShopAddPage();
 		GMMPage addSupplierPage = new SupplierAddPage();
 		GMMPage restockPage = new RestockPage();
+		GMMPage addItemPage = new AddItemPage();
 
 		// construct menu buttons
 		JButton marketPageButton = new MenuButton("Market View", new MenuListener(marketPage));
 		JButton addShopPageButton = new MenuButton("Add New Shop", new MenuListener(addShopPage));
 		JButton addSupplierPageButton = new MenuButton("Add New Supplier", new MenuListener(addSupplierPage));
-		JButton restockPageButton = new MenuButton("Inform of Shop Restock", new MenuListener(restockPage));
+		JButton restockPageButton = new MenuButton("Inform of Restock", new MenuListener(restockPage));
+		JButton addItemPageButton = new MenuButton("Inform of New Item", new MenuListener(addItemPage));
 		JButton logOutButton = new MenuButton("Log Out", new LogOutListener());
 
 		// add menu buttons to menuBar
@@ -206,6 +208,7 @@ public class Main {
 		menuBar.add(addShopPageButton);
 		menuBar.add(addSupplierPageButton);
 		menuBar.add(restockPageButton);
+		menuBar.add(addItemPageButton);
 		menuBar.add(logOutButton);
 
 		// show market page on startup
