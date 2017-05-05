@@ -2,7 +2,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.table.AbstractTableModel;
 
@@ -14,9 +13,9 @@ public class TopOrdersTableModel extends AbstractTableModel{
 	public TopOrdersTableModel(ResultSet rs, String[] names) throws SQLException {
 		this.columnNames = names;
 		convert(rs);
-		for (Order order : list) {
-			System.out.println(order.item);
-		}
+//		for (Order order : list) {
+//			System.out.println(order.item);
+//		}
 	}
 
 	@Override

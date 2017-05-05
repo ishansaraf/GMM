@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
@@ -16,6 +17,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -27,6 +29,7 @@ import javax.swing.ScrollPaneConstants;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableColumnModel;
 /**
  * 
  * Page for market data viewing
@@ -53,6 +56,8 @@ public class MarketPage implements GMMPage{
 	private GameHandler gameHandler;
 	boolean atBottomOnUnshow;
 	int count = 0;
+	private JLabel ordersLabel;
+	private JLabel itemsLabel;
 	
 	public class RefreshListener implements ActionListener {
 
@@ -91,6 +96,12 @@ public class MarketPage implements GMMPage{
 		this.ordersTable = new JTable();
 		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
 		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
+		this.ordersLabel = new JLabel("10 Most Recent Orders");
+		this.ordersLabel.setForeground(Main.TEXT_COLOR);
+		this.ordersLabel.setBackground(Main.BG_COLOR2);
+		this.ordersLabel.setFont(Main.HEADER_FONT);
+		this.ordersLabel.setVisible(false);
+		orderPanel.add(this.ordersLabel);
 		orderPanel.add(ordersHeader);
 		orderPanel.add(this.ordersTable);
 		displayPanel.add(orderPanel);
@@ -101,6 +112,12 @@ public class MarketPage implements GMMPage{
 		this.itemsTable = new JTable();
 		itemPanel.setLayout(new BoxLayout(itemPanel, BoxLayout.Y_AXIS));
 		JTableHeader itemsHeader = this.itemsTable.getTableHeader();
+		this.itemsLabel = new JLabel("Inventory");
+		this.itemsLabel.setForeground(Main.TEXT_COLOR);
+		this.itemsLabel.setBackground(Main.BG_COLOR2);
+		this.itemsLabel.setFont(Main.HEADER_FONT);
+		this.itemsLabel.setVisible(false);
+		itemPanel.add(this.itemsLabel);
 		itemPanel.add(itemsHeader);
 		itemPanel.add(this.itemsTable);
 		displayPanel.add(itemPanel);
@@ -109,11 +126,11 @@ public class MarketPage implements GMMPage{
 		
 		//set table properties
 		this.ordersTable.setRowHeight(20);
-		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		this.ordersTable.setShowHorizontalLines(false);
 		this.ordersTable.setShowVerticalLines(false);
 		this.itemsTable.setRowHeight(20);
-		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
 		this.itemsTable.setShowHorizontalLines(false);
 		this.itemsTable.setShowVerticalLines(false);
 		
@@ -121,25 +138,27 @@ public class MarketPage implements GMMPage{
 		//set colors and font
 		displayPanel.setBackground(Main.BG_COLOR2);
 		orderPanel.setBackground(Main.BG_COLOR2);
+		itemPanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
 		ordersHeader.setBackground(Main.BG_COLOR2);
 		ordersHeader.setForeground(Main.TEXT_COLOR);
-		ordersHeader.setFont(Main.FIELD_FONT);
+		ordersHeader.setFont(Main.TABLE_FONT);
 		itemsHeader.setBackground(Main.BG_COLOR2);
 		itemsHeader.setForeground(Main.TEXT_COLOR);
-		itemsHeader.setFont(Main.FIELD_FONT);
+		itemsHeader.setFont(Main.TABLE_FONT);
 		this.ordersTable.setBackground(Main.BG_COLOR2);
 		this.ordersTable.setForeground(Main.TEXT_COLOR);
-		this.ordersTable.setFont(Main.FIELD_FONT);
+		this.ordersTable.setFont(Main.TABLE_FONT);
 		this.itemsTable.setBackground(Main.BG_COLOR2);
 		this.itemsTable.setForeground(Main.TEXT_COLOR);
-		this.itemsTable.setFont(Main.FIELD_FONT);
+		this.itemsTable.setFont(Main.TABLE_FONT);
 		refresh.setFont(Main.FIELD_FONT);
 		
 		
 		//create the updateFeed Listbox for displaying updates
 		this.updateListModel = new DefaultListModel<>();
 		this.updateFeed = new JList<>(this.updateListModel);
+		this.updateFeed.setFont(new Font(Font.MONOSPACED, Font.BOLD, 16));
 		this.updateFeed.setBackground(Main.BG_COLOR);
 		this.updateFeed.setForeground(Main.TEXT_COLOR);
 		this.updateFeed.setCellRenderer(new CSCListCellRenderer(Main.BG_COLOR));
@@ -153,6 +172,7 @@ public class MarketPage implements GMMPage{
 		//create the shopList Listbox for displaying updates
 		this.shopListModel = new DefaultListModel<>();
 		this.shopList = new JList<>(this.shopListModel);
+		this.shopList.setFont(Main.LIST_FONT);
 		
 		ListSelectionModel lsm = this.shopList.getSelectionModel();
 		lsm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -169,26 +189,20 @@ public class MarketPage implements GMMPage{
 		JPanel shopsPanel = new JPanel();
 		this.search = new JTextField();
 		this.search.addKeyListener(new KeyListener() {
-
 			@Override
 			public void keyPressed(KeyEvent e) {
 				if (e.getKeyCode()==KeyEvent.VK_ENTER) {
 					search();
 				}
 			}
-
 			@Override
 			public void keyReleased(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
+				// nothing
 			}
-
 			@Override
 			public void keyTyped(KeyEvent arg0) {
-				// TODO Auto-generated method stub
-				
+				//nothing
 			}
-			
 		});
 		shopsPanel.setLayout(new GridBagLayout());
 		GridBagConstraints c = new GridBagConstraints();
@@ -216,8 +230,8 @@ public class MarketPage implements GMMPage{
 		this.shopScrollList.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
 		
 		//set prefererred sizes
-		this.eastPanel.setPreferredSize(new Dimension(600, 0));
-		this.shopScrollList.setPreferredSize(new Dimension(295, 0));
+		this.eastPanel.setPreferredSize(new Dimension(Main.WINDOW_SIZE_X - 200, 0));
+		this.shopScrollList.setPreferredSize(new Dimension(195, 0));
 		
 		kickOffUpdateThreads();
 	}
@@ -236,6 +250,7 @@ public class MarketPage implements GMMPage{
 				}
 			}
 		}
+		this.shopList.setModel(this.shopListModel);
 	}
 	
 	@Override
@@ -295,6 +310,8 @@ public class MarketPage implements GMMPage{
 	}
 	
 	public void refresh() throws SQLException {
+		this.ordersLabel.setVisible(false);
+		this.itemsLabel.setVisible(false);
 		this.ordersTable.setVisible(false);
 		this.ordersTable.getTableHeader().setVisible(false);
 		this.itemsTable.setVisible(false);
@@ -305,11 +322,17 @@ public class MarketPage implements GMMPage{
 		cs1.setString(2, Main.MerchantID);
 		ResultSet ors = cs1.executeQuery();
 		if (ors.isBeforeFirst()) {
+			this.ordersLabel.setVisible(true);
 			this.ordersTable.setVisible(true);
 			this.ordersTable.getTableHeader().setVisible(true);
 			String[] orderNames = {"Item", "Quantity", "Player", "Order Time"};
 			TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
 			this.ordersTable.setModel(ordersModel);
+			TableColumnModel colModel = this.ordersTable.getColumnModel();
+			colModel.getColumn(0).setPreferredWidth(160);
+			colModel.getColumn(1).setPreferredWidth(5);
+			colModel.getColumn(2).setPreferredWidth(160);
+			colModel.getColumn(3).setPreferredWidth(120);
 		}
 		
 		CallableStatement cs2 = Main.conn.prepareCall("{call getShopItems(?, ?)}");
@@ -317,12 +340,19 @@ public class MarketPage implements GMMPage{
 		cs2.setString(2, Main.MerchantID);
 		ResultSet irs = cs2.executeQuery();
 		if (irs.isBeforeFirst()) {
+			this.itemsLabel.setVisible(true);
 			this.itemsTable.setVisible(true);
 			this.itemsTable.getTableHeader().setVisible(true);
 			String[] itemNames = {"Item", "Quantity", "Unit Price"};
 			ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames);
 			this.itemsTable.setModel(itemsModel);
+			TableColumnModel colModel = this.itemsTable.getColumnModel();
+			colModel.getColumn(0).setPreferredWidth(300);
+			colModel.getColumn(1).setPreferredWidth(5);
+			colModel.getColumn(2).setPreferredWidth(5);
 		}
+
+		System.out.println("(re)loaded shop data!");
 //		this.test.setText(shopName + " " + count);
 //		count++;
 	}

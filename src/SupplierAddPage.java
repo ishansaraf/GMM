@@ -78,7 +78,7 @@ public class SupplierAddPage implements GMMPage {
 		// populate ComboBoxes
 		List<String> tempArrList = Main.getServerList();
 		String[] modelArray = new String[tempArrList.size() + 1];
-		modelArray[0] = " ";
+		modelArray[0] = "                         ";
 		for (int i = 0; i < modelArray.length - 1; i++) {
 			modelArray[i + 1] = tempArrList.get(i);
 		}
@@ -246,7 +246,7 @@ public class SupplierAddPage implements GMMPage {
 		String locY = locationY.getText();
 		String disc = discount.getText();
 		
-		if(supname.equals("") || servername.equals("") || locX.equals("") || locY.equals("")) {
+		if(supname.trim().length() == 0 || servername.trim().length() == 0|| locX.trim().length() == 0 || locY.trim().length() == 0) {
 			JOptionPane.showMessageDialog(null, "Please fill out all required fields.");
 			return false;
 		}

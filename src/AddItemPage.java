@@ -37,13 +37,13 @@ public class AddItemPage implements GMMPage {
 		JPanel headerPanel = new JPanel();
 
 		// create Labels
-		JLabel itemLabel = new JLabel(" *Item Name:   ");
+		JLabel itemLabel = new JLabel("   *Item Name:  ");
 		JLabel descriptionLabel = new JLabel(" Description: ");
-		JLabel baseValueLabel = new JLabel("*Base Value:  ");
-		JLabel baseValueLabelAfter = new JLabel("                                         ");
+		JLabel baseValueLabel = new JLabel("   *Base Value: ");
+		JLabel baseValueLabelAfter = new JLabel("                ");
 
 		// create Fields
-		this.item = new JTextField(50);
+		this.item = new JTextField(25);
 		this.description = new JTextArea(6, 50);
 		this.baseValue = new JTextField(8);
 

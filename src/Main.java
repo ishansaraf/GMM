@@ -44,6 +44,9 @@ public class Main {
 	public static final JLabel EMPTY_CELL = new JLabel();
 	public static final Font HEADER_FONT = new Font(null, Font.BOLD, 24);
 	public static final Font FIELD_FONT = new Font(Font.MONOSPACED, Font.BOLD, 18);
+	public static final Font LIST_FONT = new Font(Font.MONOSPACED, Font.BOLD, 12);
+	public static final Font TABLE_FONT = new Font(Font.MONOSPACED, Font.BOLD, 16);
+	public static final int WINDOW_SIZE_X = 1000;
 
 	static String MerchantID;
 	static Queue<String> updateQueue;
@@ -68,7 +71,7 @@ public class Main {
 		while (true) {
 			if (relaunch) {
 				mainframe = new JFrame();
-				mainframe.setSize(900, 600);
+				mainframe.setSize(WINDOW_SIZE_X, 600);
 				mainframe.setTitle("GMM Marketing Solutions");
 				mainframe.setResizable(false);
 				mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -185,7 +188,7 @@ public class Main {
 		menuBar = new JPanel();
 		menuBar.setLayout(new GridLayout(0, 6));
 		menuBar.setBackground(Color.GRAY);
-		menuBar.setPreferredSize(new Dimension(900, 30));
+		menuBar.setPreferredSize(new Dimension(WINDOW_SIZE_X, 30));
 		mainframe.add(menuBar, BorderLayout.NORTH);
 
 		// construct pages

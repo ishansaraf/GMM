@@ -89,7 +89,7 @@ public class ShopAddPage implements GMMPage {
 		// populate ComboBoxes
 		List<String> tempArrList = Main.getServerList();
 		String[] modelArray = new String[tempArrList.size() + 1];
-		modelArray[0] = "                      ";
+		modelArray[0] = "                         ";
 		for (int i = 0; i < modelArray.length - 1; i++) {
 			modelArray[i + 1] = tempArrList.get(i);
 		}
@@ -245,7 +245,7 @@ public class ShopAddPage implements GMMPage {
 
 		// Check to see if any of the required fields are empty, throw an
 		// alert and return if so
-		if (shopname.equals("") || servername.equals("") || locX.equals("") || locY.equals("")) {
+		if (shopname.trim().length() == 0 || servername.trim().length() == 0 || locX.trim().length() == 0 || locY.trim().length() == 0) {
 			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please fill out all required field(s).");
 			return false;
 		}
