@@ -12,6 +12,7 @@ import java.sql.CallableStatement;
 import java.sql.Connection;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JPasswordField;
 import javax.swing.JTextField;
@@ -36,11 +38,19 @@ import javax.swing.text.AbstractDocument;
  */
 public class Main {
 
-	public static final Color BG_COLOR = new Color(43, 43, 43);//new Color(100, 100, 200);
-	public static final Color BG_COLOR2 = new Color(33, 33, 33);//new Color(90, 90, 180);
-	public static final Color FIELD_COLOR = new Color(23, 23, 23);//new Color(150, 150, 250);
-	public static final Color MENU_BUTTON_COLOR = new Color(13, 13, 13);//new Color(50, 50, 150);
-	public static final Color TEXT_COLOR = new Color(220, 220, 220);//Color.BLACK;
+	public static final Color BG_COLOR = new Color(43, 43, 43);// new Color(100,
+																// 100, 200);
+	public static final Color BG_COLOR2 = new Color(33, 33, 33);// new Color(90,
+																// 90, 180);
+	public static final Color FIELD_COLOR = new Color(23, 23, 23);// new
+																	// Color(150,
+																	// 150,
+																	// 250);
+	public static final Color MENU_BUTTON_COLOR = new Color(13, 13, 13);// new
+																		// Color(50,
+																		// 50,
+																		// 150);
+	public static final Color TEXT_COLOR = new Color(220, 220, 220);// Color.BLACK;
 	public static final JLabel EMPTY_CELL = new JLabel();
 	public static final Font HEADER_FONT = new Font(null, Font.BOLD, 24);
 	public static final Font FIELD_FONT = new Font(Font.MONOSPACED, Font.BOLD, 18);
@@ -53,7 +63,7 @@ public class Main {
 	static List<String> serverList;
 	static List<String> supplierList;
 	static List<String> itemList;
-	
+
 	static JPanel menuBar;
 	static GMMPage curPage;
 	static boolean relaunch;
@@ -63,10 +73,10 @@ public class Main {
 
 	public static void main(String[] args) throws SQLException {
 		relaunch = true;
-		
+
 		dbConnect connector = new dbConnect();
 		conn = connector.connect();
-		
+
 		while (true) {
 			if (relaunch) {
 				mainframe = new JFrame();
@@ -117,17 +127,17 @@ public class Main {
 		JLabel logoImgLabel = new JLabel(new ImageIcon(logoImg));
 		JLabel UsernameLabel = new JLabel("Username:");
 		JLabel PasswordLabel = new JLabel("Password:");
-		
-		//setForeground
+
+		// setForeground
 		UsernameLabel.setForeground(TEXT_COLOR);
 		PasswordLabel.setForeground(TEXT_COLOR);
 
 		// create fields
 		JTextField UsernameField = new JTextField(15);
 		JPasswordField PasswordField = new JPasswordField(15);
-		
-		//limit fields
-		((AbstractDocument)UsernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
+
+		// limit fields
+		((AbstractDocument) UsernameField.getDocument()).setDocumentFilter(new LimitDocumentFilter(20));
 
 		// misc construct & settings
 		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
@@ -230,12 +240,13 @@ public class Main {
 		try {
 			CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList()}");
 			ResultSet rs = proc.executeQuery();
-			while(rs.next()) {
+			while (rs.next()) {
 				shopList.add(rs.getString(1));
 			}
+		} catch (SQLException exception) {
+			exception.printStackTrace();
 		}
-		catch (SQLException exception) {exception.printStackTrace();}
-		
+
 		return shopList;
 	}
 
@@ -253,53 +264,72 @@ public class Main {
 	}
 
 	public static List<String> getServerList() {
-		if (serverList.isEmpty()){
+		if (serverList.isEmpty()) {
 			try {
 				CallableStatement proc = Main.conn.prepareCall("{call dbo.getServerList()}");
 				ResultSet rs = proc.executeQuery();
-				while(rs.next()) {
+				while (rs.next()) {
 					serverList.add(rs.getString(1));
 				}
+			} catch (SQLException exception) {
+				exception.printStackTrace();
 			}
-			catch (SQLException exception) {exception.printStackTrace();}
 		}
 		return serverList;
 	}
 
 	public static List<String> getSupplierList() {
-		if (supplierList.isEmpty()){
+		if (supplierList.isEmpty()) {
 			try {
 				CallableStatement proc = Main.conn.prepareCall("{call dbo.getSupplierList()}");
 				ResultSet rs = proc.executeQuery();
-				while(rs.next()) {
+				while (rs.next()) {
 					supplierList.add(rs.getString(1));
 				}
+			} catch (SQLException exception) {
+				exception.printStackTrace();
 			}
-			catch (SQLException exception) {exception.printStackTrace();}
 		}
 		return supplierList;
 	}
-	
-	public static List<String> getSupplierList(String shop) {
+
+	public static ArrayList<String> getSupplierList(String shop) {
 		ArrayList<String> list = new ArrayList<>();
-		
+		try {
+			CallableStatement cs = Main.conn.prepareCall("{? = call getSuppliersByShop(?, ?)}");
+			cs.registerOutParameter(1, Types.INTEGER);
+			cs.setString(2, shop);
+			cs.setString(3, Main.MerchantID);
+			ResultSet rs = cs.executeQuery();
+			while (rs.next()) {
+				list.add(rs.getString("Name") + " [" + rs.getDouble("Discount") + ", "
+							+ Math.floor(Math.sqrt(rs.getDouble("DistanceSq")) * 100) / 100 + "]");
+			}
+			int status = cs.getInt(1);
+			if (status == 1) {
+				JOptionPane.showMessageDialog(null, "Could not retrieve supplier list for shop " + shop + ".");
+				return new ArrayList<>();
+			}
+		} catch (SQLException e) {
+			e.printStackTrace();
+		}
 		return list;
 	}
 
 	public static List<String> getItemList() {
-		if (itemList.isEmpty()){
+		if (itemList.isEmpty()) {
 			try {
 				CallableStatement proc = Main.conn.prepareCall("{call dbo.getItemList()}");
 				ResultSet rs = proc.executeQuery();
-				while(rs.next()) {
+				while (rs.next()) {
 					itemList.add(rs.getString(1));
 				}
+			} catch (SQLException exception) {
+				exception.printStackTrace();
 			}
-			catch (SQLException exception) {exception.printStackTrace();}
 		}
 		return itemList;
 	}
-	
 
 	/**
 	 * Method to check if given string is numeric or contains other characters

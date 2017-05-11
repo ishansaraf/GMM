@@ -58,6 +58,7 @@ public class RestockPage implements GMMPage {
 
 		// create Other
 		this.Shop = new JComboBox<>();
+		this.Shop.addActionListener(new ShopListener());
 		this.Supplier = new JComboBox<>();
 
 		this.Orders = new JPanel(new GridLayout(NUM_ROWS, 1));
@@ -191,6 +192,8 @@ public class RestockPage implements GMMPage {
 	private void placeOrder() {
 		String shop = ((String) this.Shop.getSelectedItem()).trim();
 		String supplier = ((String) this.Supplier.getSelectedItem()).trim();
+		int index = supplier.lastIndexOf("[");
+		supplier = supplier.substring(0, index - 1);
 		ArrayList<String> items = new ArrayList<>();
 		ArrayList<Integer> quantities = new ArrayList<>();
 		for (int i = 0; i < NUM_ROWS; i++) {
@@ -299,9 +302,20 @@ public class RestockPage implements GMMPage {
 			Main.mainframe.add(this.centerPanel, BorderLayout.CENTER);
 			Main.curPage = this;
 			updateComboBoxes();
+			clearOrderPanel();
 			Main.mainframe.revalidate();
 			Main.mainframe.repaint();
 			System.out.println("RestockPage Loaded");
+		}
+	}
+	
+	public void clearOrderPanel() {
+		for (int i = 0; i < NUM_ROWS; i++) {
+			JPanel order = (JPanel) this.Orders.getComponent(i);
+			JComboBox<String> box = (JComboBox<String>) order.getComponent(0);
+			box.setSelectedIndex(0);
+			JTextField text = (JTextField) order.getComponent(2);
+			text.setText("");
 		}
 	}
 
@@ -338,6 +352,8 @@ public class RestockPage implements GMMPage {
 			}
 			Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
 			Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
+//			Supplier.revalidate();
+//			Supplier.repaint();
 		}
 
 	}
