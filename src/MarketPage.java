@@ -11,7 +11,10 @@ import java.awt.event.KeyListener;
 import java.sql.CallableStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 
+import javax.swing.AbstractAction;
+import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -26,9 +29,11 @@ import javax.swing.JTable;
 import javax.swing.JTextField;
 import javax.swing.ListSelectionModel;
 import javax.swing.ScrollPaneConstants;
+import javax.swing.event.ChangeEvent;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.table.JTableHeader;
+import javax.swing.table.TableCellEditor;
 import javax.swing.table.TableColumnModel;
 /**
  * 
@@ -59,6 +64,7 @@ public class MarketPage implements GMMPage{
 	int count = 0;
 	private JLabel ordersLabel;
 	private JLabel itemsLabel;
+	private JLabel fundsLabel;
 	
 	public class RefreshListener implements ActionListener {
 
@@ -91,11 +97,18 @@ public class MarketPage implements GMMPage{
 		JPanel topPanel = new JPanel();
 		displayPanel.add(topPanel);
 		topPanel.add(this.refresh);
-		
+		//add funds label
+		this.fundsLabel = new JLabel("");
+		this.fundsLabel.setForeground(Main.TEXT_COLOR);
+		this.fundsLabel.setBackground(Main.BG_COLOR2);
+		this.fundsLabel.setFont(Main.FIELD_FONT);
+		this.fundsLabel.setVisible(false);
+		displayPanel.add(this.fundsLabel);
 		//add orders table
 		JPanel orderPanel = new JPanel();
 		orderPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
 		this.ordersTable = new JTable();
+		this.ordersTable.putClientProperty("terminateEditOnFocusLost", true);
 		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
 		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
 		this.ordersLabel = new JLabel("10 Most Recent Orders");
@@ -111,7 +124,19 @@ public class MarketPage implements GMMPage{
 		//add items table
 		JPanel itemPanel = new JPanel();
 		itemPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
-		this.itemsTable = new JTable();
+		this.itemsTable = new JTable() {
+			
+			@Override
+			public void editingStopped(ChangeEvent e) {
+				TableCellEditor editor = (TableCellEditor) e.getSource();
+				int row = itemsTable.getEditingRow();
+				int col = itemsTable.getEditingColumn();
+				String value = (String) editor.getCellEditorValue();
+				((ShopItemsTableModel) itemsTable.getModel()).update(row, col, value, shopList.getSelectedValue());
+				editor.cancelCellEditing();
+			}
+		};
+		this.itemsTable.putClientProperty("terminateEditOnFocusLost", true);
 		itemPanel.setLayout(new BoxLayout(itemPanel, BoxLayout.Y_AXIS));
 		JTableHeader itemsHeader = this.itemsTable.getTableHeader();
 		this.itemsLabel = new JLabel("Inventory");
@@ -128,11 +153,11 @@ public class MarketPage implements GMMPage{
 		
 		//set table properties
 		this.ordersTable.setRowHeight(20);
-		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.ordersTable.setShowHorizontalLines(false);
 		this.ordersTable.setShowVerticalLines(false);
 		this.itemsTable.setRowHeight(20);
-		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_ALL_COLUMNS);
+		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.itemsTable.setShowHorizontalLines(false);
 		this.itemsTable.setShowVerticalLines(false);
 		
@@ -329,7 +354,7 @@ public class MarketPage implements GMMPage{
 			this.ordersLabel.setVisible(true);
 			this.ordersTable.setVisible(true);
 			this.ordersTable.getTableHeader().setVisible(true);
-			String[] orderNames = {"Item", "Quantity", "Player", "Order Time"};
+			String[] orderNames = {"Item", "Qty.", "Player", "Order Time"};
 			TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
 			this.ordersTable.setModel(ordersModel);
 			TableColumnModel colModel = this.ordersTable.getColumnModel();
@@ -347,15 +372,26 @@ public class MarketPage implements GMMPage{
 			this.itemsLabel.setVisible(true);
 			this.itemsTable.setVisible(true);
 			this.itemsTable.getTableHeader().setVisible(true);
-			String[] itemNames = {"Item", "Quantity", "Unit Price"};
-			ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames);
+			String[] itemNames = {"Item", "Qty.", "Price", "Description", "Disc."};
+			ShopItemsTableModel itemsModel = new ShopItemsTableModel(irs, itemNames, this);
 			this.itemsTable.setModel(itemsModel);
 			TableColumnModel colModel = this.itemsTable.getColumnModel();
-			colModel.getColumn(0).setPreferredWidth(300);
+			colModel.getColumn(0).setPreferredWidth(160);
 			colModel.getColumn(1).setPreferredWidth(5);
 			colModel.getColumn(2).setPreferredWidth(5);
+			colModel.getColumn(3).setPreferredWidth(300);
+			colModel.getColumn(4).setPreferredWidth(5);
 		}
-
+		
+		CallableStatement cs3 = Main.conn.prepareCall("{call getFunds(?, ?, ?)}");
+		cs3.registerOutParameter(3, Types.DECIMAL);
+		cs3.setString(1, shopName);
+		cs3.setString(2, Main.MerchantID);
+		cs3.execute();
+		String funds = Double.toString(cs3.getDouble(3));
+		funds = "Funds: " + funds;
+		this.fundsLabel.setText(funds);
+		this.fundsLabel.setVisible(true);
 		System.out.println("(re)loaded shop data!");
 //		this.test.setText(shopName + " " + count);
 //		count++;
@@ -367,7 +403,6 @@ public class MarketPage implements GMMPage{
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()){
 				try {
-					
 					refresh();
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");

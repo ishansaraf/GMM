@@ -3,6 +3,10 @@ import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.CallableStatement;
+import java.sql.SQLException;
+import java.sql.Types;
+import java.util.ArrayList;
 import java.util.List;
 
 import javax.swing.BoxLayout;
@@ -11,6 +15,7 @@ import javax.swing.DefaultComboBoxModel;
 import javax.swing.JButton;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -23,12 +28,12 @@ public class RestockPage implements GMMPage {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub.
-
+			placeOrder();
 		}
 
 	}
-
+	
+	private static int NUM_ROWS = 20;
 	JPanel centerPanel;
 	JComboBox<String> Shop;
 	JComboBox<String> Supplier;
@@ -55,12 +60,12 @@ public class RestockPage implements GMMPage {
 		this.Shop = new JComboBox<>();
 		this.Supplier = new JComboBox<>();
 		
-		this.Orders = new JPanel(new GridLayout(20, 1));
+		this.Orders = new JPanel(new GridLayout(NUM_ROWS, 1));
 		
 		JScrollPane ordersScrollPane = new JScrollPane(this.Orders);
 //		ordersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		ordersScrollPane.setPreferredSize(new Dimension(800, 308));
-		for (int i = 0; i < 20; i++) {			
+		for (int i = 0; i < NUM_ROWS; i++) {			
 			this.addOrder();
 		}	
 		ordersScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
@@ -182,6 +187,87 @@ public class RestockPage implements GMMPage {
 		//add and refresh
 		this.Orders.add(orderPanel);
 		Main.mainframe.repaint();
+	}
+	
+	private void placeOrder() {
+		String shop = ((String) this.Shop.getSelectedItem()).trim();
+		String supplier = ((String) this.Supplier.getSelectedItem()).trim();
+		ArrayList<String> items = new ArrayList<>();
+		ArrayList<Integer> quantities = new ArrayList<>();
+		for (int i = 0; i < NUM_ROWS; i++) {
+			JPanel order = (JPanel) this.Orders.getComponent(i);
+			JComboBox<String> box = (JComboBox<String>) order.getComponent(0);
+			String item = ((String) box.getSelectedItem()).trim();
+			if (item.equals("")) {
+				continue;
+			}
+			JTextField text = (JTextField) order.getComponent(2);
+			String q = text.getText().trim();
+			if (q.equals("")) {
+				JOptionPane.showMessageDialog(null, "Please enter a quantity for item " + item + ".");
+				return;
+			}
+			int quantity = 0;
+			try {
+				quantity = Integer.parseInt(q);
+			} catch(NumberFormatException e) {
+				JOptionPane.showMessageDialog(null, "Please enter a whole number quantity for item " + item + ".");
+				return;
+			}
+			items.add(item);
+			quantities.add(quantity);
+		}
+		if (items.isEmpty()) {
+			JOptionPane.showMessageDialog(null, "No items selected.\nNo stock orders placed.");
+			return;
+		}
+		if (shop.equals("")) {
+			JOptionPane.showMessageDialog(null, "Please select a shop");
+			return;
+		}	
+		if (supplier.equals("")) {
+			JOptionPane.showMessageDialog(null, "Please select a supplier");
+			return;
+		}	
+		for (int i = 0; i < items.size(); i++) {
+			try {
+				CallableStatement cs = Main.conn.prepareCall("{? = call addStockOrder(?, ?, ?, ?, ?)}");
+				cs.registerOutParameter(1, Types.INTEGER);
+				cs.setString(2, shop);
+				cs.setString(3, supplier);
+				cs.setString(4, items.get(i));
+				cs.setInt(5, quantities.get(i));
+				cs.setString(6, Main.MerchantID);
+				cs.executeUpdate();
+				int status = cs.getInt(1);
+				if (status != 0) {
+					if (status == 1) {
+						JOptionPane.showMessageDialog(null, "Error RP1"
+								+ "\nShop: " + shop
+								+ "\nSupplier: " + supplier
+								+ "\nItem: " + items.get(i)
+								+ "\nQuantity: " + quantities.get(i)
+								+ "\nOrder may be partially completed.");
+						return;
+					}
+					if (status == 2) {
+						JOptionPane.showMessageDialog(null, "Insufficient funds in shop.\nOrder may be partially completed.");
+						return;
+					}
+				}
+			} catch (SQLException e) {
+				e.printStackTrace();
+				JOptionPane.showMessageDialog(null, "Error RP0"
+						+ "\nShop: " + shop
+						+ "\nSupplier: " + supplier
+						+ "\nItem: " + items.get(i)
+						+ "\nQuantity: " + quantities.get(i)
+						+ "\nOrder may be partially completed.");
+				return;
+			}
+			
+		}
+		JOptionPane.showMessageDialog(null, "Orders completed!");
 	}
 
 	private void updateComboBoxes(){
