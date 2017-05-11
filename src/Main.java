@@ -281,7 +281,9 @@ public class Main {
 	}
 	
 	public static List<String> getSupplierList(String shop) {
+		ArrayList<String> list = new ArrayList<>();
 		
+		return list;
 	}
 
 	public static List<String> getItemList() {
