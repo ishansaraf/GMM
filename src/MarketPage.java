@@ -46,6 +46,7 @@ public class MarketPage implements GMMPage{
 
 	JScrollPane eastPanel;
 	JButton refresh;
+	JButton close;
 	DefaultListModel<String> updateListModel;
 	JList<String> updateFeed;
 	JScrollPane updateScrollFeed;
@@ -65,6 +66,7 @@ public class MarketPage implements GMMPage{
 	private JLabel ordersLabel;
 	private JLabel itemsLabel;
 	private JLabel fundsLabel;
+	private String currShop = "";
 	
 	public class RefreshListener implements ActionListener {
 
@@ -77,6 +79,20 @@ public class MarketPage implements GMMPage{
 				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
 			}	
 		}
+	}
+	
+	public class CloseListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			try {
+				updateShop();
+			} catch (SQLException e1) {
+				JOptionPane.showMessageDialog(null, "Cannot update shop.");
+				e1.printStackTrace();
+			}
+		}
+		
 	}
 	
 	public MarketPage() {
@@ -104,22 +120,6 @@ public class MarketPage implements GMMPage{
 		this.fundsLabel.setFont(Main.FIELD_FONT);
 		this.fundsLabel.setVisible(false);
 		displayPanel.add(this.fundsLabel);
-		//add orders table
-		JPanel orderPanel = new JPanel();
-		orderPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
-		this.ordersTable = new JTable();
-		this.ordersTable.putClientProperty("terminateEditOnFocusLost", true);
-		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
-		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
-		this.ordersLabel = new JLabel("10 Most Recent Orders");
-		this.ordersLabel.setForeground(Main.TEXT_COLOR);
-		this.ordersLabel.setBackground(Main.BG_COLOR2);
-		this.ordersLabel.setFont(Main.HEADER_FONT);
-		this.ordersLabel.setVisible(false);
-		orderPanel.add(this.ordersLabel);
-		orderPanel.add(ordersHeader);
-		orderPanel.add(this.ordersTable);
-		displayPanel.add(orderPanel);
 		
 		//add items table
 		JPanel itemPanel = new JPanel();
@@ -149,6 +149,28 @@ public class MarketPage implements GMMPage{
 		itemPanel.add(this.itemsTable);
 		displayPanel.add(itemPanel);
 		
+		//add orders table
+		JPanel orderPanel = new JPanel();
+		orderPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		this.ordersTable = new JTable();
+		this.ordersTable.putClientProperty("terminateEditOnFocusLost", true);
+		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
+		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
+		this.ordersLabel = new JLabel("10 Most Recent Orders");
+		this.ordersLabel.setForeground(Main.TEXT_COLOR);
+		this.ordersLabel.setBackground(Main.BG_COLOR2);
+		this.ordersLabel.setFont(Main.HEADER_FONT);
+		this.ordersLabel.setVisible(false);
+		orderPanel.add(this.ordersLabel);
+		orderPanel.add(ordersHeader);
+		orderPanel.add(this.ordersTable);
+		displayPanel.add(orderPanel);
+		
+		this.close = new MenuButton("", new CloseListener());
+		this.close.setVisible(false);
+		JPanel botPanel = new JPanel();
+		displayPanel.add(botPanel);
+		botPanel.add(this.close);
 		displayPanel.add(Box.createVerticalGlue());
 		
 		//set table properties
@@ -167,6 +189,7 @@ public class MarketPage implements GMMPage{
 		orderPanel.setBackground(Main.BG_COLOR2);
 		itemPanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
+		botPanel.setBackground(Main.BG_COLOR2);
 		ordersHeader.setBackground(Main.BG_COLOR2);
 		ordersHeader.setForeground(Main.TEXT_COLOR);
 		ordersHeader.setFont(Main.TABLE_FONT);
@@ -180,6 +203,7 @@ public class MarketPage implements GMMPage{
 		this.itemsTable.setForeground(Main.TEXT_COLOR);
 		this.itemsTable.setFont(Main.TABLE_FONT);
 		this.refresh.setFont(Main.FIELD_FONT);
+		this.close.setFont(Main.FIELD_FONT);
 		
 		
 		//create the updateFeed Listbox for displaying updates
@@ -284,6 +308,7 @@ public class MarketPage implements GMMPage{
 	public void changeToPage() {
 		if (Main.curPage != this) {
 			if (Main.curPage != null) Main.curPage.unShow();
+			this.currShop = "";
 			Main.mainframe.add(this.eastPanel, BorderLayout.EAST);
 			Main.mainframe.add(this.shopScrollList, BorderLayout.WEST);
 			Main.mainframe.add(this.updateScrollFeed, BorderLayout.SOUTH);
@@ -291,16 +316,40 @@ public class MarketPage implements GMMPage{
 			Main.mainframe.revalidate();
 			Main.mainframe.repaint();
 			
-			this.shopListModel = new DefaultListModel<>();
-			for (String ShopID : Main.getShopList()) {
-				this.shopListModel.addElement(ShopID);
+			try {
+				this.populateShopList();
+			} catch (SQLException e) {
+				JOptionPane.showMessageDialog(null, "Cannot populate shop list.");
+				e.printStackTrace();
 			}
-			this.shopList.setModel(this.shopListModel);
 
 			this.refresh.setVisible(false);
+			this.close.setVisible(false);
+			this.fundsLabel.setVisible(false);
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
 		}
+	}
+	
+	private void populateShopList() throws SQLException {
+		this.shopListModel = new DefaultListModel<>();
+		for (String ShopID : Main.getShopList()) {
+			String shopName = ShopID;
+			CallableStatement cs4;
+			cs4 = Main.conn.prepareCall("{? = call getShopStatus(?, ?, ?)}");
+			cs4.registerOutParameter(4, Types.BOOLEAN);
+			cs4.registerOutParameter(1, Types.INTEGER);
+			cs4.setString(2, shopName);
+			cs4.setString(3, Main.MerchantID);
+			cs4.execute();
+			boolean closed = cs4.getBoolean(4);
+			if (closed) {
+				shopName = "[CLOSED] " + shopName;
+			}
+			System.out.println(shopName);
+			this.shopListModel.addElement(shopName);
+		}
+		this.shopList.setModel(this.shopListModel);
 	}
 	
 	private void kickOffUpdateThreads() {
@@ -337,6 +386,25 @@ public class MarketPage implements GMMPage{
 		System.out.println("MarketPage Unloaded");
 	}
 	
+	public void updateShop() throws SQLException {
+		String shopName = this.currShop.replace("[CLOSED] ", "");
+		CallableStatement cs = Main.conn.prepareCall("{? = call updateShop(?, ?, ?)}");
+		cs.registerOutParameter(1, Types.INTEGER);
+		cs.setString(2, shopName);
+		cs.setString(3, Main.MerchantID);
+		if (this.close.getText().equals("Close Shop")) {
+			cs.setBoolean(4, true);
+		} else if (this.close.getText().equals("Re-Open Shop")) {
+			cs.setBoolean(4, false);
+		} else {
+			return;
+		}
+		cs.execute();
+		this.populateShopList();
+		this.shopList.revalidate();
+		this.shopList.repaint();
+	}
+	
 	public void refresh() throws SQLException {
 		this.refresh.setVisible(true);
 		this.ordersLabel.setVisible(false);
@@ -345,7 +413,7 @@ public class MarketPage implements GMMPage{
 		this.ordersTable.getTableHeader().setVisible(false);
 		this.itemsTable.setVisible(false);
 		this.itemsTable.getTableHeader().setVisible(false);
-		String shopName = this.shopList.getSelectedValue();
+		String shopName = this.currShop.replace("[CLOSED] ", "");
 		CallableStatement cs1 = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
 		cs1.setString(1, shopName);
 		cs1.setString(2, Main.MerchantID);
@@ -392,6 +460,20 @@ public class MarketPage implements GMMPage{
 		funds = "Funds: " + funds;
 		this.fundsLabel.setText(funds);
 		this.fundsLabel.setVisible(true);
+
+		CallableStatement cs4 = Main.conn.prepareCall("{? = call getShopStatus(?, ?, ?)}");
+		cs4.registerOutParameter(4, Types.BOOLEAN);
+		cs4.registerOutParameter(1, Types.INTEGER);
+		cs4.setString(2, shopName);
+		cs4.setString(3, Main.MerchantID);
+		cs4.execute();
+		boolean closed = cs4.getBoolean(4);
+		if (closed) {
+			this.close.setText("Re-Open Shop");
+		} else {
+			this.close.setText("Close Shop");
+		}
+		this.close.setVisible(true);
 		System.out.println("(re)loaded shop data!");
 //		this.test.setText(shopName + " " + count);
 //		count++;
@@ -403,6 +485,9 @@ public class MarketPage implements GMMPage{
 		public void valueChanged(ListSelectionEvent e) {
 			if (!e.getValueIsAdjusting()){
 				try {
+					if (shopList.getSelectedValue() != null) {
+						currShop = shopList.getSelectedValue();
+					}
 					refresh();
 				} catch (SQLException e1) {
 					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");

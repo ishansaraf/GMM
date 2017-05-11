@@ -145,13 +145,14 @@ public class GameHandler implements Runnable {
 		String shop = withoutItem.substring(0, withoutItem.length()-1);
 		//now that we have the data we can actually add the buy order:
 		try {
-			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addBuyOrder(?, ?, ?, ?) }");
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addBuyOrder(?, ?, ?, ?, ?) }");
 
 			// Registering parameters in CallableStatement
 			proc.setString(2, player);
 			proc.setInt(3, quantity);
 			proc.setString(4, item);
 			proc.setString(5, shop);
+			proc.setString(6, Main.MerchantID);
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.execute();
 
@@ -159,7 +160,7 @@ public class GameHandler implements Runnable {
 
 			// Checking that buyOrder add was successful
 			// returnVal 5 means not enough quantity of item in store for buyorder
-			if (returnVal != 0 && returnVal != 5) {
+			if (returnVal != 0) {
 				JOptionPane.showMessageDialog(null, 
 						"there was a problem registering a buy order in the database. Error code is: " + returnVal);
 				JOptionPane.showMessageDialog(null, "Player: " + player + 

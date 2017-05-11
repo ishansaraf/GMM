@@ -53,7 +53,6 @@ public class Main {
 	static List<String> serverList;
 	static List<String> supplierList;
 	static List<String> itemList;
-	static List<String> shopList;
 	
 	static JPanel menuBar;
 	static GMMPage curPage;
@@ -75,7 +74,6 @@ public class Main {
 				mainframe.setTitle("GMM Marketing Solutions");
 				mainframe.setResizable(false);
 				mainframe.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-				shopList = new ArrayList<>();
 				serverList = new ArrayList<>();
 				supplierList = new ArrayList<>();
 				itemList = new ArrayList<>();
@@ -227,17 +225,17 @@ public class Main {
 	 *
 	 * @return List<String>
 	 */
-	public static List<String> getShopList() {
-		if (shopList.isEmpty()){
-			try {
-				CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList()}");
-				ResultSet rs = proc.executeQuery();
-				while(rs.next()) {
-					shopList.add(rs.getString(1));
-				}
+	public static ArrayList<String> getShopList() {
+		ArrayList<String> shopList = new ArrayList<>();
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList()}");
+			ResultSet rs = proc.executeQuery();
+			while(rs.next()) {
+				shopList.add(rs.getString(1));
 			}
-			catch (SQLException exception) {exception.printStackTrace();}
 		}
+		catch (SQLException exception) {exception.printStackTrace();}
+		
 		return shopList;
 	}
 

@@ -9,6 +9,8 @@
 /Main$LogOutListener.class
 /Main.class
 /MarketPage$1.class
+/MarketPage$2.class
+/MarketPage$CloseListener.class
 /MarketPage$RefreshListener.class
 /MarketPage$ShopListListener.class
 /MarketPage.class
@@ -22,10 +24,8 @@
 /ShopItemsTableModel.class
 /SupplierAddPage$SubmitListener.class
 /SupplierAddPage.class
+/TableCellListener.class
 /TopOrdersTableModel$Order.class
 /TopOrdersTableModel.class
 /Updater.class
 /dbConnect.class
-/TableCellListener.class
-/MarketPage$2.class
-/MarketPage$3.class

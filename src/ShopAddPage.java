@@ -215,7 +215,7 @@ public class ShopAddPage implements GMMPage {
 				JOptionPane.showMessageDialog(null, "Store " + name + " was successfully added!");
 				
 				//update loaded list
-				Main.shopList.add(name);
+				//Main.shopList.add(name);
 				// blank out fields after success
 				this.name.setText("");
 				this.server.setSelectedIndex(0);

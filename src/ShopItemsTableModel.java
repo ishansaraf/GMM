@@ -186,7 +186,7 @@ public class ShopItemsTableModel extends AbstractTableModel{
 			}
 			if (disc) {
 				this.disc = "Y";
-				this.name += " [Disc.]";
+				this.name += " [DISC.]";
 			} else {
 				this.disc = "N";
 			}
