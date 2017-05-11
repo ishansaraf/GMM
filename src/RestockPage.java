@@ -32,15 +32,15 @@ public class RestockPage implements GMMPage {
 		}
 
 	}
-	
+
 	private static int NUM_ROWS = 20;
 	JPanel centerPanel;
 	JComboBox<String> Shop;
 	JComboBox<String> Supplier;
 	JPanel Orders;
-	
+
 	public RestockPage() {
-		//create panels
+		// create panels
 		this.centerPanel = new JPanel();
 		JPanel shopPanel = new JPanel();
 		JPanel supplierPanel = new JPanel();
@@ -48,49 +48,49 @@ public class RestockPage implements GMMPage {
 		JPanel submitPanel = new JPanel();
 		JPanel headerPanel = new JPanel();
 
-		//create Labels
+		// create Labels
 		JLabel shopLabel = new JLabel("*Shop:     ");
 		JLabel supplierLabel = new JLabel("*Supplier: ");
 		JLabel ordersHeaderLabel = new JLabel("Item:                      Quantity:         ");
-		
-		//create button
+
+		// create button
 		JButton submitButton = new MenuButton("Submit", new SubmitListener());
-		
-		//create Other
+
+		// create Other
 		this.Shop = new JComboBox<>();
 		this.Supplier = new JComboBox<>();
-		
+
 		this.Orders = new JPanel(new GridLayout(NUM_ROWS, 1));
-		
+
 		JScrollPane ordersScrollPane = new JScrollPane(this.Orders);
-//		ordersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
+		// ordersScrollPane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_NEVER);
 		ordersScrollPane.setPreferredSize(new Dimension(800, 308));
-		for (int i = 0; i < NUM_ROWS; i++) {			
+		for (int i = 0; i < NUM_ROWS; i++) {
 			this.addOrder();
-		}	
+		}
 		ordersScrollPane.setBorder(javax.swing.BorderFactory.createEmptyBorder());
-		
-		//populate Shop ComboBox
+
+		// populate Shop ComboBox
 		List<String> tempArrList = Main.getShopList();
-		String[] modelArray = new String[tempArrList.size()+1];
+		String[] modelArray = new String[tempArrList.size() + 1];
 		modelArray[0] = "                         ";
-		for (int i = 0; i < modelArray.length-1; i++) {
-			modelArray[i+1] = tempArrList.get(i);
+		for (int i = 0; i < modelArray.length - 1; i++) {
+			modelArray[i + 1] = tempArrList.get(i);
 		}
 		this.Shop.setModel(new DefaultComboBoxModel<>(modelArray));
 		this.Shop.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
-		
-		//populate Supplier ComboBox
+
+		// populate Supplier ComboBox
 		tempArrList = Main.getSupplierList();
-		modelArray = new String[tempArrList.size()+1];
+		modelArray = new String[tempArrList.size() + 1];
 		modelArray[0] = "                         ";
-		for (int i = 0; i < modelArray.length-1; i++) {
-			modelArray[i+1] = tempArrList.get(i);
+		for (int i = 0; i < modelArray.length - 1; i++) {
+			modelArray[i + 1] = tempArrList.get(i);
 		}
 		this.Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
 		this.Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
-		
-		//set fonts
+
+		// set fonts
 		shopLabel.setFont(Main.FIELD_FONT);
 		supplierLabel.setFont(Main.FIELD_FONT);
 		ordersHeaderLabel.setFont(Main.FIELD_FONT);
@@ -98,8 +98,8 @@ public class RestockPage implements GMMPage {
 		this.Shop.setFont(Main.FIELD_FONT);
 		this.Supplier.setFont(Main.FIELD_FONT);
 		this.Orders.setFont(Main.FIELD_FONT);
-		
-		//set foreground
+
+		// set foreground
 		shopLabel.setForeground(Main.TEXT_COLOR);
 		supplierLabel.setForeground(Main.TEXT_COLOR);
 		ordersHeaderLabel.setForeground(Main.TEXT_COLOR);
@@ -107,8 +107,8 @@ public class RestockPage implements GMMPage {
 		this.Shop.setForeground(Main.TEXT_COLOR);
 		this.Supplier.setForeground(Main.TEXT_COLOR);
 		this.Orders.setForeground(Main.TEXT_COLOR);
-		
-		//add stuff to stuff
+
+		// add stuff to stuff
 		shopPanel.add(shopLabel);
 		shopPanel.add(this.Shop);
 		supplierPanel.add(supplierLabel);
@@ -126,8 +126,8 @@ public class RestockPage implements GMMPage {
 		this.centerPanel.add(ordersHeaderLabel);
 		this.centerPanel.add(ordersPanel);
 		this.centerPanel.add(submitPanel);
-		
-		//set BG colors
+
+		// set BG colors
 		this.centerPanel.setBackground(Main.BG_COLOR);
 		shopPanel.setBackground(Main.BG_COLOR);
 		supplierPanel.setBackground(Main.BG_COLOR);
@@ -138,57 +138,56 @@ public class RestockPage implements GMMPage {
 		this.Shop.setBackground(Main.FIELD_COLOR);
 		this.Supplier.setBackground(Main.FIELD_COLOR);
 	}
-	
+
 	private void addOrder() {
 		JPanel orderPanel = new JPanel();
-		
+
 		JComboBox<String> Item = new JComboBox<>();
 		JLabel Spacer = new JLabel("     ");
 		JTextField Quantity = new JTextField(4);
-		((AbstractDocument)Quantity.getDocument()).setDocumentFilter(new LimitDocumentFilter(4));
-		
-		//populate ComboBox
+		((AbstractDocument) Quantity.getDocument()).setDocumentFilter(new LimitDocumentFilter(4));
+
+		// populate ComboBox
 		List<String> tempArrList = Main.getItemList();
-		String[] modelArray = new String[tempArrList.size()+1];
+		String[] modelArray = new String[tempArrList.size() + 1];
 		modelArray[0] = "                    ";
-		for (int i = 0; i < modelArray.length-1; i++) {
-			modelArray[i+1] = tempArrList.get(i);
+		for (int i = 0; i < modelArray.length - 1; i++) {
+			modelArray[i + 1] = tempArrList.get(i);
 		}
 		ComboBoxModel<String> ItemModel = new DefaultComboBoxModel<>(modelArray);
 		Item.setModel(ItemModel);
 		Item.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
-		
-		//set fonts
+
+		// set fonts
 		Item.setFont(Main.FIELD_FONT);
 		Quantity.setFont(Main.FIELD_FONT);
 		Spacer.setFont(Main.FIELD_FONT);
-		
-		//set foreground color
+
+		// set foreground color
 		Item.setForeground(Main.TEXT_COLOR);
 		Quantity.setForeground(Main.TEXT_COLOR);
-		
-		//add to panel
+
+		// add to panel
 		orderPanel.add(Item);
 		orderPanel.add(Spacer);
 		orderPanel.add(Quantity);
-		
-		//alternate panel colors
-		if (this.Orders.getComponentCount() % 2 == 0){			
+
+		// alternate panel colors
+		if (this.Orders.getComponentCount() % 2 == 0) {
 			orderPanel.setBackground(Main.BG_COLOR2);
-		}
-		else {
+		} else {
 			orderPanel.setBackground(Main.BG_COLOR);
 		}
-		
-		//set background colors
+
+		// set background colors
 		Item.setBackground(Main.FIELD_COLOR);
 		Quantity.setBackground(Main.FIELD_COLOR);
-		
-		//add and refresh
+
+		// add and refresh
 		this.Orders.add(orderPanel);
 		Main.mainframe.repaint();
 	}
-	
+
 	private void placeOrder() {
 		String shop = ((String) this.Shop.getSelectedItem()).trim();
 		String supplier = ((String) this.Supplier.getSelectedItem()).trim();
@@ -210,7 +209,7 @@ public class RestockPage implements GMMPage {
 			int quantity = 0;
 			try {
 				quantity = Integer.parseInt(q);
-			} catch(NumberFormatException e) {
+			} catch (NumberFormatException e) {
 				JOptionPane.showMessageDialog(null, "Please enter a whole number quantity for item " + item + ".");
 				return;
 			}
@@ -224,11 +223,11 @@ public class RestockPage implements GMMPage {
 		if (shop.equals("")) {
 			JOptionPane.showMessageDialog(null, "Please select a shop");
 			return;
-		}	
+		}
 		if (supplier.equals("")) {
 			JOptionPane.showMessageDialog(null, "Please select a supplier");
 			return;
-		}	
+		}
 		for (int i = 0; i < items.size(); i++) {
 			try {
 				CallableStatement cs = Main.conn.prepareCall("{? = call addStockOrder(?, ?, ?, ?, ?)}");
@@ -242,61 +241,57 @@ public class RestockPage implements GMMPage {
 				int status = cs.getInt(1);
 				if (status != 0) {
 					if (status == 1) {
-						JOptionPane.showMessageDialog(null, "Error RP1"
-								+ "\nShop: " + shop
-								+ "\nSupplier: " + supplier
-								+ "\nItem: " + items.get(i)
-								+ "\nQuantity: " + quantities.get(i)
-								+ "\nOrder may be partially completed.");
+						JOptionPane.showMessageDialog(null,
+								"Error RP1" + "\nShop: " + shop + "\nSupplier: " + supplier + "\nItem: " + items.get(i)
+										+ "\nQuantity: " + quantities.get(i) + "\nOrder may be partially completed.");
 						return;
 					}
 					if (status == 2) {
-						JOptionPane.showMessageDialog(null, "Insufficient funds in shop.\nOrder may be partially completed.");
+						JOptionPane.showMessageDialog(null,
+								"Insufficient funds in shop.\nOrder may be partially completed.");
 						return;
 					}
 				}
 			} catch (SQLException e) {
 				e.printStackTrace();
-				JOptionPane.showMessageDialog(null, "Error RP0"
-						+ "\nShop: " + shop
-						+ "\nSupplier: " + supplier
-						+ "\nItem: " + items.get(i)
-						+ "\nQuantity: " + quantities.get(i)
-						+ "\nOrder may be partially completed.");
+				JOptionPane.showMessageDialog(null,
+						"Error RP0" + "\nShop: " + shop + "\nSupplier: " + supplier + "\nItem: " + items.get(i)
+								+ "\nQuantity: " + quantities.get(i) + "\nOrder may be partially completed.");
 				return;
 			}
-			
+
 		}
 		JOptionPane.showMessageDialog(null, "Orders completed!");
+		this.changeToPage();
 	}
 
-	private void updateComboBoxes(){
-		//update Shop ComboBox
+	private void updateComboBoxes() {
+		// update Shop ComboBox
 		List<String> tempArrList = Main.getShopList();
 		String[] modelArray;
 		if (this.Shop.getModel().getSize() != tempArrList.size()) {
-			modelArray = new String[tempArrList.size()+1];
+			modelArray = new String[tempArrList.size() + 1];
 			modelArray[0] = "                      ";
-			for (int i = 0; i < modelArray.length-1; i++) {
-				modelArray[i+1] = tempArrList.get(i);
+			for (int i = 0; i < modelArray.length - 1; i++) {
+				modelArray[i + 1] = tempArrList.get(i);
 			}
 			this.Shop.setModel(new DefaultComboBoxModel<>(modelArray));
 			this.Shop.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		}
-		//update Supplier ComboBox
+		// update Supplier ComboBox
 		tempArrList = Main.getSupplierList();
-		System.out.println(this.Supplier.getModel().getSize()-1 + " vs. " + tempArrList.size());
-		if (this.Supplier.getModel().getSize()-1 != tempArrList.size()) {
-			modelArray = new String[tempArrList.size()+1];
+		System.out.println(this.Supplier.getModel().getSize() - 1 + " vs. " + tempArrList.size());
+		if (this.Supplier.getModel().getSize() - 1 != tempArrList.size()) {
+			modelArray = new String[tempArrList.size() + 1];
 			modelArray[0] = "                      ";
-			for (int i = 0; i < modelArray.length-1; i++) {
-				modelArray[i+1] = tempArrList.get(i);
+			for (int i = 0; i < modelArray.length - 1; i++) {
+				modelArray[i + 1] = tempArrList.get(i);
 			}
 			this.Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
 			this.Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		}
 	}
-	
+
 	@Override
 	public void changeToPage() {
 		if (Main.curPage != this) {
@@ -318,8 +313,33 @@ public class RestockPage implements GMMPage {
 
 	@Override
 	public void unShow() {
-		if (this.centerPanel != null) Main.mainframe.remove(this.centerPanel);
+		if (this.centerPanel != null)
+			Main.mainframe.remove(this.centerPanel);
 		System.out.println("RestockPage Unloaded");
+	}
+
+	class ShopListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent e) {
+			JComboBox cb = (JComboBox) e.getSource();
+			String shopName = ((String) cb.getSelectedItem()).trim();
+			ArrayList<String> supplierList;
+			String[] modelArray;
+			if (shopName.equals("")) {
+				supplierList = (ArrayList) Main.getSupplierList();
+			} else {
+				supplierList = (ArrayList) Main.getSupplierList(shopName);
+			}
+			modelArray = new String[supplierList.size() + 1];
+			modelArray[0] = "                      ";
+			for (int i = 0; i < modelArray.length - 1; i++) {
+				modelArray[i + 1] = supplierList.get(i);
+			}
+			Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
+			Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
+		}
+
 	}
 
 }

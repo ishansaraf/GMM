@@ -279,6 +279,10 @@ public class Main {
 		}
 		return supplierList;
 	}
+	
+	public static List<String> getSupplierList(String shop) {
+		
+	}
 
 	public static List<String> getItemList() {
 		if (itemList.isEmpty()){
