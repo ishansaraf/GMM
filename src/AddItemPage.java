@@ -1,32 +1,40 @@
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.sql.CallableStatement;
+import java.sql.Types;
 
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.text.AbstractDocument;
 
 public class AddItemPage implements GMMPage {
-	public class SubmitListener implements ActionListener {
 
-		@Override
-		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub.
-
-		}
-
-	}
-
+	// Fields for GUI
 	JPanel centerPanel;
 	private JTextField item;
 	private JTextArea description;
 	private JTextField baseValue;
-	
-	
+
+	public class SubmitListener implements ActionListener {
+
+		@Override
+		public void actionPerformed(ActionEvent arg0) {
+			// Only try to add item if inputs validated correctly
+			if (validateInputs()) {
+				// Parsing numeric fields
+				double base = Double.parseDouble(baseValue.getText());
+
+				addItem(item.getText(), description.getText(), base);
+			}
+		}
+	}
+
 	public AddItemPage() {
 		// create panels
 		this.centerPanel = new JPanel();
@@ -115,7 +123,7 @@ public class AddItemPage implements GMMPage {
 		this.description.setBackground(Main.FIELD_COLOR);
 		this.baseValue.setBackground(Main.FIELD_COLOR);
 	}
-	
+
 	@Override
 	public void changeToPage() {
 		if (Main.curPage != this) {
@@ -131,13 +139,72 @@ public class AddItemPage implements GMMPage {
 	@Override
 	public void shutDown() {
 		// nothing special
-		
+
 	}
 
 	@Override
 	public void unShow() {
-		if (this.centerPanel != null) Main.mainframe.remove(this.centerPanel);
+		if (this.centerPanel != null)
+			Main.mainframe.remove(this.centerPanel);
 		System.out.println("AddItemPage Unloaded");
 	}
 
+	public void addItem(String name, String desc, double val) {
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.addItem(?, ?, ?) }");
+			
+			// Registering parameters in CallableStatement to fill values
+			proc.setString(2, name);
+			proc.setDouble(3, val);
+			proc.setString(4, desc);
+			
+			// Getting return code from stored procedure to indicate success/error
+			proc.registerOutParameter(1, Types.INTEGER);
+			proc.execute();
+			
+			int returnVal = proc.getInt(1);
+			
+			// Checking that item was successfully added
+			if (returnVal == 1)
+				JOptionPane.showMessageDialog(null, "Item already exists in database. Please input new parameters.");
+			else if (returnVal == 0) {
+				JOptionPane.showMessageDialog(null, name + " was successfully added!");
+				
+				// blank out fields upon success
+				this.item.setText("");
+				this.baseValue.setText("");
+				this.description.setText("");
+			}
+			else
+				JOptionPane.showMessageDialog(null, "Item addition failed. Error code is: " + returnVal);
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+	}
+
+	public boolean validateInputs() {
+		// Temporary string to validate input
+		String baseVal = baseValue.getText();
+		String name = item.getText();
+
+		// Check if any required fields are empty
+		if (baseVal.trim().length() == 0 || name.trim().length() == 0) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please fill out all required field(s).");
+			return false;
+		}
+		// Check that base value is numeric
+		if (!Main.isNumeric(baseVal) && !baseVal.isEmpty()) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0),
+					"Please enter a valid number for the item value.");
+			return false;
+		}
+		// Check that base value is positive
+		if (!baseVal.isEmpty() && Double.parseDouble(baseVal) <= 0) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0),
+					"Please enter a positive number for item value.");
+			return false;
+		}
+
+		return true;
+	}
 }
