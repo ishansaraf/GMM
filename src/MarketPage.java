@@ -13,8 +13,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 
-import javax.swing.AbstractAction;
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -67,6 +65,8 @@ public class MarketPage implements GMMPage{
 	private JLabel itemsLabel;
 	private JLabel fundsLabel;
 	private String currShop = "";
+	private JTable restocksTable;
+	private JLabel restocksLabel;
 	
 	public class RefreshListener implements ActionListener {
 
@@ -166,6 +166,24 @@ public class MarketPage implements GMMPage{
 		orderPanel.add(this.ordersTable);
 		displayPanel.add(orderPanel);
 		
+		//add restocks table
+		JPanel restocksPanel = new JPanel();
+		restocksPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		this.restocksTable = new JTable();
+		this.restocksTable.putClientProperty("terminateEditOnFocusLost", true);
+		restocksPanel.setLayout(new BoxLayout(restocksPanel, BoxLayout.Y_AXIS));
+		JTableHeader restocksHeader = this.restocksTable.getTableHeader();
+		this.restocksLabel = new JLabel("10 Most Recent Restocks");
+		this.restocksLabel.setForeground(Main.TEXT_COLOR);
+		this.restocksLabel.setBackground(Main.BG_COLOR2);
+		this.restocksLabel.setFont(Main.HEADER_FONT);
+		this.restocksLabel.setVisible(false);
+		restocksPanel.add(this.restocksLabel);
+		restocksPanel.add(restocksHeader);
+		restocksPanel.add(this.restocksTable);
+		displayPanel.add(restocksPanel);
+		
+		//close button
 		this.close = new MenuButton("", new CloseListener());
 		this.close.setVisible(false);
 		JPanel botPanel = new JPanel();
@@ -178,6 +196,10 @@ public class MarketPage implements GMMPage{
 		this.ordersTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.ordersTable.setShowHorizontalLines(false);
 		this.ordersTable.setShowVerticalLines(false);
+		this.restocksTable.setRowHeight(20);
+		this.restocksTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
+		this.restocksTable.setShowHorizontalLines(false);
+		this.restocksTable.setShowVerticalLines(false);
 		this.itemsTable.setRowHeight(20);
 		this.itemsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.itemsTable.setShowHorizontalLines(false);
@@ -187,18 +209,25 @@ public class MarketPage implements GMMPage{
 		//set colors and font
 		displayPanel.setBackground(Main.BG_COLOR2);
 		orderPanel.setBackground(Main.BG_COLOR2);
+		restocksPanel.setBackground(Main.BG_COLOR2);
 		itemPanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
 		botPanel.setBackground(Main.BG_COLOR2);
 		ordersHeader.setBackground(Main.BG_COLOR2);
 		ordersHeader.setForeground(Main.TEXT_COLOR);
 		ordersHeader.setFont(Main.TABLE_FONT);
+		restocksHeader.setBackground(Main.BG_COLOR2);
+		restocksHeader.setForeground(Main.TEXT_COLOR);
+		restocksHeader.setFont(Main.TABLE_FONT);
 		itemsHeader.setBackground(Main.BG_COLOR2);
 		itemsHeader.setForeground(Main.TEXT_COLOR);
 		itemsHeader.setFont(Main.TABLE_FONT);
 		this.ordersTable.setBackground(Main.BG_COLOR2);
 		this.ordersTable.setForeground(Main.TEXT_COLOR);
 		this.ordersTable.setFont(Main.TABLE_FONT);
+		this.restocksTable.setBackground(Main.BG_COLOR2);
+		this.restocksTable.setForeground(Main.TEXT_COLOR);
+		this.restocksTable.setFont(Main.TABLE_FONT);
 		this.itemsTable.setBackground(Main.BG_COLOR2);
 		this.itemsTable.setForeground(Main.TEXT_COLOR);
 		this.itemsTable.setFont(Main.TABLE_FONT);
@@ -408,15 +437,19 @@ public class MarketPage implements GMMPage{
 	public void refresh() throws SQLException {
 		this.refresh.setVisible(true);
 		this.ordersLabel.setVisible(false);
+		this.restocksLabel.setVisible(false);
 		this.itemsLabel.setVisible(false);
 		this.ordersTable.setVisible(false);
 		this.ordersTable.getTableHeader().setVisible(false);
+		this.restocksTable.setVisible(false);
+		this.restocksTable.getTableHeader().setVisible(false);
 		this.itemsTable.setVisible(false);
 		this.itemsTable.getTableHeader().setVisible(false);
 		String shopName = this.currShop.replace("[CLOSED] ", "");
-		CallableStatement cs1 = Main.conn.prepareCall("{call getLastTenOrders(?, ?)}");
+		CallableStatement cs1 = Main.conn.prepareCall("{call getLastNOrders(?, ?, ?)}");
 		cs1.setString(1, shopName);
 		cs1.setString(2, Main.MerchantID);
+		cs1.setInt(3, Main.numOrdersShown);
 		ResultSet ors = cs1.executeQuery();
 		if (ors.isBeforeFirst()) {
 			this.ordersLabel.setVisible(true);
@@ -473,10 +506,30 @@ public class MarketPage implements GMMPage{
 		} else {
 			this.close.setText("Close Shop");
 		}
+		
+		CallableStatement cs5 = Main.conn.prepareCall("{call getLastNRestocks(?, ?, ?)}");
+		cs5.setString(1, shopName);
+		cs5.setString(2, Main.MerchantID);
+		cs5.setInt(3, Main.numOrdersShown);
+		ResultSet rrs = cs5.executeQuery();
+		if (rrs.isBeforeFirst()) {
+			this.restocksLabel.setVisible(true);
+			this.restocksTable.setVisible(true);
+			this.restocksTable.getTableHeader().setVisible(true);
+			String[] restockNames = {"Item", "Qty.", "Supplier", "Order Time"};
+			TopRestocksTableModel restocksModel = new TopRestocksTableModel(rrs, restockNames);
+			this.restocksTable.setModel(restocksModel);
+			TableColumnModel colModel = this.restocksTable.getColumnModel();
+			colModel.getColumn(0).setPreferredWidth(160);
+			colModel.getColumn(1).setPreferredWidth(5);
+			colModel.getColumn(2).setPreferredWidth(160);
+			colModel.getColumn(3).setPreferredWidth(120);
+		}
 		this.close.setVisible(true);
 		System.out.println("(re)loaded shop data!");
 //		this.test.setText(shopName + " " + count);
 //		count++;
+		
 	}
 	
 	class ShopListListener implements ListSelectionListener {

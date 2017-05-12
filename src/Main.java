@@ -64,6 +64,7 @@ public class Main {
 	static List<String> serverList;
 	static List<String> supplierList;
 	static List<String> itemList;
+	public static int numOrdersShown = 10;
 
 	static JPanel menuBar;
 	static GMMPage curPage;
