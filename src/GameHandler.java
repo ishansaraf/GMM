@@ -77,15 +77,14 @@ public class GameHandler implements Runnable {
 				Main.updateQueue.add(chatline);
 			}
 		}
-		else if (!valid && playerName.contains(" stopped by ")) {
-			String[] ajbArr = playerName.split(" stopped by ");
-			String ajb = ajbArr[ajbArr.length-1];
-			if (ajb.contains(" but there was nothing to buy.")){
-				//Its a message about why you have no stock
-				Main.updateQueue.add(chatline);
-			}
-		}
-//		System.out.println(chatline);
+//		else if (!valid && playerName.contains(" stopped by ")) {
+//			String[] ajbArr = playerName.split(" stopped by ");
+//			String ajb = ajbArr[ajbArr.length-1];
+//			if (ajb.contains(" but there was nothing to buy.")){
+//				//Its a message about why you have no stock
+//				Main.updateQueue.add(chatline);
+//			}
+//		}
 	}
 
 	private boolean isValidPlayer(String playerName) {
