@@ -1,7 +1,11 @@
 import java.awt.BorderLayout;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.sql.CallableStatement;
 import java.sql.Types;
 
@@ -31,15 +35,42 @@ public class RegistrationPage implements GMMPage {
 
 		@Override
 		public void actionPerformed(ActionEvent arg0) {
-			// TODO Auto-generated method stub
+			// Only trying to encrypt password if input fields correctly entered
+			if (validateInputs()) {
+				String pwd = encryptPassword();
 
+				// Check that password encrypted correctly
+				if (pwd.trim().length() != 0) {
+					String user = username.getText();
+					String emailID = email.getText();
+					addMerchant(user, emailID, pwd);
+
+					// Blanking out password string
+					pwd = "";
+
+					// Closing window, reopening login
+					Main.register = false;
+					Main.relaunch = true;
+					frame.dispose();
+				}
+			}
 		}
 
 	}
 
 	public RegistrationPage(JFrame frame) {
 		this.frame = frame;
-		
+
+		// Reopening login page if closed
+		frame.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+		frame.addWindowListener(new WindowAdapter() {
+			public void windowClosing(WindowEvent event) {
+				Main.register = false;
+				Main.relaunch = true;
+				frame.dispose();
+			}
+		});
+
 		// Create panels
 		centerPanel = new JPanel();
 		JPanel userPanel = new JPanel();
@@ -54,8 +85,8 @@ public class RegistrationPage implements GMMPage {
 
 		// Create fields
 		username = new JTextField(30);
-		password = new JPasswordField(15);
-		email = new JTextField(50);
+		password = new JPasswordField(30);
+		email = new JTextField(30);
 
 		// Create button
 		JButton registerButton = new MenuButton("Register", new SubmitListener());
@@ -75,7 +106,7 @@ public class RegistrationPage implements GMMPage {
 		// Limiting fields
 		((AbstractDocument) username.getDocument()).setDocumentFilter(new LimitDocumentFilter(30));
 		((AbstractDocument) password.getDocument()).setDocumentFilter(new LimitDocumentFilter(15));
-		((AbstractDocument) email.getDocument()).setDocumentFilter(new LimitDocumentFilter(50));
+		((AbstractDocument) email.getDocument()).setDocumentFilter(new LimitDocumentFilter(30));
 
 		// Set fonts
 		userLabel.setFont(Main.FIELD_FONT);
@@ -89,14 +120,17 @@ public class RegistrationPage implements GMMPage {
 
 		// Add fields to panels
 		userPanel.add(userLabel);
-		passPanel.add(passLabel);
+		userPanel.add(username);
 		emailPanel.add(emailLabel);
+		emailPanel.add(email);
+		passPanel.add(passLabel);
+		passPanel.add(password);
 		registerPanel.add(registerButton);
-		centerPanel.setLayout(new GridLayout(2, 2));
-		centerPanel.add(header);
+		centerPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
+		centerPanel.add(header, BorderLayout.NORTH);
 		centerPanel.add(userPanel);
-		centerPanel.add(passPanel);
 		centerPanel.add(emailPanel);
+		centerPanel.add(passPanel);
 		centerPanel.add(registerPanel);
 
 		// Set background colors
@@ -105,9 +139,9 @@ public class RegistrationPage implements GMMPage {
 		passPanel.setBackground(Main.BG_COLOR);
 		emailPanel.setBackground(Main.BG_COLOR);
 		registerPanel.setBackground(Main.BG_COLOR);
-		username.setBackground(Main.BG_COLOR);
-		password.setBackground(Main.BG_COLOR);
-		email.setBackground(Main.BG_COLOR);
+		username.setBackground(Main.FIELD_COLOR);
+		password.setBackground(Main.FIELD_COLOR);
+		email.setBackground(Main.FIELD_COLOR);
 	}
 
 	@Override
@@ -125,7 +159,7 @@ public class RegistrationPage implements GMMPage {
 
 	@Override
 	public void shutDown() {
-		//nothing
+		// nothing
 	}
 
 	@Override

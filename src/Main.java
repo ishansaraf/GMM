@@ -152,7 +152,7 @@ public class Main {
 		// misc construct & settings
 		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
-		JButton RegisterButton = new MenuButton("Register", null);
+		JButton RegisterButton = new MenuButton("Register", new RegisterListener());
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
 		CredentialPanel.setLayout(fieldLayout);
