@@ -40,7 +40,7 @@ public class ShopItemsTableModel extends AbstractTableModel{
 			return;
 		}
 		try {
-			if (col != 4 && this.list.get(row).name.contains("[DISC.]")) {
+			if (col != 4 && this.list.get(row).name.contains(" [DISC.]")) {
 				JOptionPane.showMessageDialog(null, "Please set Disc. to \"N\" before editing the item.");
 				return;
 			}
