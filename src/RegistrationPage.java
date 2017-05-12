@@ -6,6 +6,7 @@ import java.sql.CallableStatement;
 import java.sql.Types;
 
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
@@ -19,6 +20,8 @@ import org.jasypt.util.password.StrongPasswordEncryptor;
 public class RegistrationPage implements GMMPage {
 
 	// Fields for GUI
+	GMMPage curPage;
+	JFrame frame;
 	JPanel centerPanel;
 	JTextField username;
 	JPasswordField password;
@@ -34,7 +37,9 @@ public class RegistrationPage implements GMMPage {
 
 	}
 
-	public RegistrationPage() {
+	public RegistrationPage(JFrame frame) {
+		this.frame = frame;
+		
 		// Create panels
 		centerPanel = new JPanel();
 		JPanel userPanel = new JPanel();
@@ -107,26 +112,27 @@ public class RegistrationPage implements GMMPage {
 
 	@Override
 	public void changeToPage() {
-		if (Main.curPage != this) {
-			Main.curPage.unShow();
-			Main.mainframe.add(centerPanel, BorderLayout.CENTER);
-			Main.curPage = this;
-			Main.mainframe.revalidate();
-			Main.mainframe.repaint();
+		if (this.curPage != this) {
+			this.frame.add(centerPanel, BorderLayout.CENTER);
+			this.curPage = this;
+			this.frame.revalidate();
+			this.frame.repaint();
+			this.frame.setLocationRelativeTo(null);
+			this.frame.setVisible(true);
 			System.out.println("RegistrationPage Loaded");
 		}
 	}
 
 	@Override
 	public void shutDown() {
-		// TODO Auto-generated method stub
-
+		//nothing
 	}
 
 	@Override
 	public void unShow() {
 		if (centerPanel != null)
-			Main.mainframe.remove(centerPanel);
+			this.frame.remove(centerPanel);
+		this.curPage = null;
 		System.out.println("RegistrationPage unloaded");
 	}
 

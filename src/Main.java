@@ -68,12 +68,14 @@ public class Main {
 	static JPanel menuBar;
 	static GMMPage curPage;
 	static boolean relaunch;
+	static boolean register;
 	static JFrame mainframe;
 	protected static GMMPage marketPage;
 	static Connection conn;
 
 	public static void main(String[] args) throws SQLException {
 		relaunch = true;
+		register = true; //default to false: set to true to swap to register page
 
 		dbConnect connector = new dbConnect();
 		conn = connector.connect();
@@ -110,6 +112,13 @@ public class Main {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+		//setUp registration page
+		JFrame regFrame = new JFrame("Register an GMM account");
+		regFrame.setSize(600, 360);
+		regFrame.setResizable(false);
+		regFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+		RegistrationPage regPage = new RegistrationPage(regFrame);
+		
 		// load logo image
 		BufferedImage logoImg = null;
 		try {
@@ -184,6 +193,11 @@ public class Main {
 		// wait for verification
 		while (MerchantID == null) {
 			try {
+				if (register) {
+					frame.dispose();
+					regPage.changeToPage();
+					return;
+				}
 				Thread.sleep(1000);
 			} catch (InterruptedException exception) {
 				exception.printStackTrace();
