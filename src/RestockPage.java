@@ -211,6 +211,8 @@ public class RestockPage implements GMMPage {
 			if (item.equals("")) {
 				continue;
 			}
+			index = item.lastIndexOf("[");
+			item = item.substring(0, index - 1);
 			JTextField text = (JTextField) order.getComponent(2);
 			String q = text.getText().trim();
 			if (q.equals("")) {

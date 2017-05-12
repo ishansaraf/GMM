@@ -342,7 +342,7 @@ public class Main {
 				CallableStatement proc = Main.conn.prepareCall("{call dbo.getItemList()}");
 				ResultSet rs = proc.executeQuery();
 				while (rs.next()) {
-					itemList.add(rs.getString(1));
+					itemList.add(rs.getString("Name") + " [" + rs.getDouble("BaseValue") + "]");
 				}
 			} catch (SQLException exception) {
 				exception.printStackTrace();
