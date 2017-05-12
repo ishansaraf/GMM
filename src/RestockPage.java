@@ -74,7 +74,7 @@ public class RestockPage implements GMMPage {
 		// populate Shop ComboBox
 		List<String> tempArrList = Main.getShopList();
 		String[] modelArray = new String[tempArrList.size() + 1];
-		modelArray[0] = "                         ";
+		modelArray[0] = "                                            ";
 		for (int i = 0; i < modelArray.length - 1; i++) {
 			modelArray[i + 1] = tempArrList.get(i);
 		}
@@ -84,7 +84,7 @@ public class RestockPage implements GMMPage {
 		// populate Supplier ComboBox
 		tempArrList = Main.getSupplierList();
 		modelArray = new String[tempArrList.size() + 1];
-		modelArray[0] = "                         ";
+		modelArray[0] = "                                            ";
 		for (int i = 0; i < modelArray.length - 1; i++) {
 			modelArray[i + 1] = tempArrList.get(i);
 		}
@@ -276,7 +276,7 @@ public class RestockPage implements GMMPage {
 		List<String> tempArrList = Main.getShopList();
 		if (this.Shop.getModel().getSize() - 1 != tempArrList.size()) {
 			String[] modelArray = new String[tempArrList.size() + 1];
-			modelArray[0] = "                      ";
+			modelArray[0] = "                                            ";
 			for (int i = 0; i < modelArray.length - 1; i++) {
 				modelArray[i + 1] = tempArrList.get(i);
 			}
@@ -287,7 +287,7 @@ public class RestockPage implements GMMPage {
 		tempArrList = Main.getSupplierList();
 		if (this.Supplier.getModel().getSize() - 1 != tempArrList.size()) {
 			String[] modelArray = new String[tempArrList.size() + 1];
-			modelArray[0] = "                      ";
+			modelArray[0] = "                                            ";
 			for (int i = 0; i < modelArray.length - 1; i++) {
 				modelArray[i + 1] = tempArrList.get(i);
 			}
@@ -347,7 +347,7 @@ public class RestockPage implements GMMPage {
 				supplierList = (ArrayList) Main.getSupplierList(shopName);
 			}
 			modelArray = new String[supplierList.size() + 1];
-			modelArray[0] = "                      ";
+			modelArray[0] = "                                            ";
 			for (int i = 0; i < modelArray.length - 1; i++) {
 				modelArray[i + 1] = supplierList.get(i);
 			}
