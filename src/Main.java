@@ -75,7 +75,7 @@ public class Main {
 
 	public static void main(String[] args) throws SQLException {
 		relaunch = true;
-		register = true; //default to false: set to true to swap to register page
+		register = false; //default to false: set to true to swap to register page
 
 		dbConnect connector = new dbConnect();
 		conn = connector.connect();
@@ -152,7 +152,7 @@ public class Main {
 		// misc construct & settings
 		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
-		JButton RegisterButton = new MenuButton("Register", null);
+		JButton RegisterButton = new MenuButton("Register", new RegisterListener());
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
 		CredentialPanel.setLayout(fieldLayout);
