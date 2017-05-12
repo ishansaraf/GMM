@@ -40,11 +40,11 @@ public class ShopItemsTableModel extends AbstractTableModel{
 			return;
 		}
 		try {
-			if (col != 4 && this.list.get(row).name.contains("[Disc.]")) {
+			if (col != 4 && this.list.get(row).name.contains("[DISC.]")) {
 				JOptionPane.showMessageDialog(null, "Please set Disc. to \"N\" before editing the item.");
 				return;
 			}
-			String name = this.list.get(row).name.replace(" [Disc.]", "");
+			String name = this.list.get(row).name.replace(" [DISC.]", "");
 			//sql.append("{? = call updateItem (name => ?, shop => ?, merUID => ?");
 			CallableStatement cs = Main.conn.prepareCall("{? = call updateItem(?, ?, ?, ?, ?)}");
 			cs.registerOutParameter(1, Types.INTEGER);
