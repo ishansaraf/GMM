@@ -64,6 +64,7 @@ public class Main {
 	static List<String> serverList;
 	static List<String> supplierList;
 	static List<String> itemList;
+	public static int numOrdersShown = 10;
 
 	static JPanel menuBar;
 	static GMMPage curPage;
@@ -75,7 +76,7 @@ public class Main {
 
 	public static void main(String[] args) throws SQLException {
 		relaunch = true;
-		register = true; //default to false: set to true to swap to register page
+		register = false; //default to false: set to true to swap to register page
 
 		dbConnect connector = new dbConnect();
 		conn = connector.connect();
