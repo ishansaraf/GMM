@@ -67,6 +67,10 @@ public class MarketPage implements GMMPage{
 	private String currShop = "";
 	private JTable restocksTable;
 	private JLabel restocksLabel;
+	protected int numOrdersShown;
+	protected int numRestocksShown;
+	private MenuButton loadMoreOrdersButton;
+	private MenuButton loadMoreRestocksButton;
 	
 	public class RefreshListener implements ActionListener {
 
@@ -156,14 +160,30 @@ public class MarketPage implements GMMPage{
 		this.ordersTable.putClientProperty("terminateEditOnFocusLost", true);
 		orderPanel.setLayout(new BoxLayout(orderPanel, BoxLayout.Y_AXIS));
 		JTableHeader ordersHeader = this.ordersTable.getTableHeader();
-		this.ordersLabel = new JLabel("10 Most Recent Orders");
+		this.ordersLabel = new JLabel("Most Recent Orders");
 		this.ordersLabel.setForeground(Main.TEXT_COLOR);
 		this.ordersLabel.setBackground(Main.BG_COLOR2);
 		this.ordersLabel.setFont(Main.HEADER_FONT);
 		this.ordersLabel.setVisible(false);
+		this.loadMoreOrdersButton = new MenuButton("Load More", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MarketPage.this.numOrdersShown+=10;
+				try {
+					refresh();
+				} catch (SQLException exception) {
+					exception.printStackTrace();
+				}
+			}
+		});
+		this.loadMoreOrdersButton.setVisible(false);
+		JPanel ordersLMPanel = new JPanel();
+		ordersLMPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		ordersLMPanel.add(this.loadMoreOrdersButton);
 		orderPanel.add(this.ordersLabel);
 		orderPanel.add(ordersHeader);
 		orderPanel.add(this.ordersTable);
+		orderPanel.add(ordersLMPanel);
 		displayPanel.add(orderPanel);
 		
 		//add restocks table
@@ -173,14 +193,30 @@ public class MarketPage implements GMMPage{
 		this.restocksTable.putClientProperty("terminateEditOnFocusLost", true);
 		restocksPanel.setLayout(new BoxLayout(restocksPanel, BoxLayout.Y_AXIS));
 		JTableHeader restocksHeader = this.restocksTable.getTableHeader();
-		this.restocksLabel = new JLabel("10 Most Recent Restocks");
+		this.restocksLabel = new JLabel("Most Recent Restocks");
 		this.restocksLabel.setForeground(Main.TEXT_COLOR);
 		this.restocksLabel.setBackground(Main.BG_COLOR2);
 		this.restocksLabel.setFont(Main.HEADER_FONT);
 		this.restocksLabel.setVisible(false);
+		this.loadMoreRestocksButton = new MenuButton("Load More", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				MarketPage.this.numRestocksShown+=10;
+				try {
+					refresh();
+				} catch (SQLException exception) {
+					exception.printStackTrace();
+				}
+			}
+		});
+		this.loadMoreRestocksButton.setVisible(false);
+		JPanel restocksLMPanel = new JPanel();
+		restocksLMPanel.setBorder(BorderFactory.createMatteBorder(20, 0, 20, 0, Main.BG_COLOR2));
+		restocksLMPanel.add(this.loadMoreRestocksButton);
 		restocksPanel.add(this.restocksLabel);
 		restocksPanel.add(restocksHeader);
 		restocksPanel.add(this.restocksTable);
+		restocksPanel.add(restocksLMPanel);
 		displayPanel.add(restocksPanel);
 		
 		//close button
@@ -209,7 +245,9 @@ public class MarketPage implements GMMPage{
 		//set colors and font
 		displayPanel.setBackground(Main.BG_COLOR2);
 		orderPanel.setBackground(Main.BG_COLOR2);
+		ordersLMPanel.setBackground(Main.BG_COLOR2);
 		restocksPanel.setBackground(Main.BG_COLOR2);
+		restocksLMPanel.setBackground(Main.BG_COLOR2);
 		itemPanel.setBackground(Main.BG_COLOR2);
 		topPanel.setBackground(Main.BG_COLOR2);
 		botPanel.setBackground(Main.BG_COLOR2);
@@ -441,20 +479,23 @@ public class MarketPage implements GMMPage{
 		this.itemsLabel.setVisible(false);
 		this.ordersTable.setVisible(false);
 		this.ordersTable.getTableHeader().setVisible(false);
+		this.loadMoreOrdersButton.setVisible(false);
 		this.restocksTable.setVisible(false);
 		this.restocksTable.getTableHeader().setVisible(false);
+		this.loadMoreRestocksButton.setVisible(false);
 		this.itemsTable.setVisible(false);
 		this.itemsTable.getTableHeader().setVisible(false);
 		String shopName = this.currShop.replace("[CLOSED] ", "");
 		CallableStatement cs1 = Main.conn.prepareCall("{call getLastNOrders(?, ?, ?)}");
 		cs1.setString(1, shopName);
 		cs1.setString(2, Main.MerchantID);
-		cs1.setInt(3, Main.numOrdersShown);
+		cs1.setInt(3, this.numOrdersShown);
 		ResultSet ors = cs1.executeQuery();
 		if (ors.isBeforeFirst()) {
 			this.ordersLabel.setVisible(true);
 			this.ordersTable.setVisible(true);
 			this.ordersTable.getTableHeader().setVisible(true);
+			this.loadMoreOrdersButton.setVisible(true);
 			String[] orderNames = {"Item", "Qty.", "Player", "Order Time"};
 			TopOrdersTableModel ordersModel = new TopOrdersTableModel(ors, orderNames);
 			this.ordersTable.setModel(ordersModel);
@@ -510,12 +551,13 @@ public class MarketPage implements GMMPage{
 		CallableStatement cs5 = Main.conn.prepareCall("{call getLastNRestocks(?, ?, ?)}");
 		cs5.setString(1, shopName);
 		cs5.setString(2, Main.MerchantID);
-		cs5.setInt(3, Main.numOrdersShown);
+		cs5.setInt(3, this.numRestocksShown);
 		ResultSet rrs = cs5.executeQuery();
 		if (rrs.isBeforeFirst()) {
 			this.restocksLabel.setVisible(true);
 			this.restocksTable.setVisible(true);
 			this.restocksTable.getTableHeader().setVisible(true);
+			this.loadMoreRestocksButton.setVisible(true);
 			String[] restockNames = {"Item", "Qty.", "Supplier", "Order Time"};
 			TopRestocksTableModel restocksModel = new TopRestocksTableModel(rrs, restockNames);
 			this.restocksTable.setModel(restocksModel);
@@ -540,6 +582,8 @@ public class MarketPage implements GMMPage{
 				try {
 					if (shopList.getSelectedValue() != null) {
 						currShop = shopList.getSelectedValue();
+						MarketPage.this.numOrdersShown = 10;
+						MarketPage.this.numRestocksShown = 10;
 					}
 					refresh();
 				} catch (SQLException e1) {
