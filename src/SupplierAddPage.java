@@ -36,6 +36,7 @@ public class SupplierAddPage implements GMMPage {
 				double lX = Double.parseDouble(locationX.getText());
 				double lY = Double.parseDouble(locationY.getText());
 				double dis = discount.getText().equals("") ? 0.00 : Double.parseDouble(discount.getText());
+				dis = dis / 100.0;
 				
 				addSupplier(name.getText(), (String) server.getSelectedItem(), lX, lY, dis);
 			}
