@@ -192,6 +192,14 @@ public class RestockPage implements GMMPage {
 	private void placeOrder() {
 		String shop = ((String) this.Shop.getSelectedItem()).trim();
 		String supplier = ((String) this.Supplier.getSelectedItem()).trim();
+		if (shop.equals("")) {
+			JOptionPane.showMessageDialog(null, "Please select a shop");
+			return;
+		}
+		if (supplier.equals("")) {
+			JOptionPane.showMessageDialog(null, "Please select a supplier");
+			return;
+		}
 		int index = supplier.lastIndexOf("[");
 		supplier = supplier.substring(0, index - 1);
 		ArrayList<String> items = new ArrayList<>();
@@ -223,14 +231,7 @@ public class RestockPage implements GMMPage {
 			JOptionPane.showMessageDialog(null, "No items selected.\nNo stock orders placed.");
 			return;
 		}
-		if (shop.equals("")) {
-			JOptionPane.showMessageDialog(null, "Please select a shop");
-			return;
-		}
-		if (supplier.equals("")) {
-			JOptionPane.showMessageDialog(null, "Please select a supplier");
-			return;
-		}
+		
 		for (int i = 0; i < items.size(); i++) {
 			try {
 				CallableStatement cs = Main.conn.prepareCall("{? = call addStockOrder(?, ?, ?, ?, ?)}");
@@ -283,7 +284,6 @@ public class RestockPage implements GMMPage {
 		}
 		// update Supplier ComboBox
 		tempArrList = Main.getSupplierList();
-		System.out.println(this.Supplier.getModel().getSize() - 1 + " vs. " + tempArrList.size());
 		if (this.Supplier.getModel().getSize() - 1 != tempArrList.size()) {
 			modelArray = new String[tempArrList.size() + 1];
 			modelArray[0] = "                      ";
