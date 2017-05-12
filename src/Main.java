@@ -1,6 +1,7 @@
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
@@ -121,7 +122,7 @@ public class Main {
 		JPanel UsernamePanel = new JPanel();
 		JPanel PasswordPanel = new JPanel();
 		JPanel CredentialPanel = new JPanel();
-		JPanel LoginPanel = new JPanel();
+		JPanel ButtonPanel = new JPanel();
 
 		// create labels
 		JLabel logoImgLabel = new JLabel(new ImageIcon(logoImg));
@@ -142,9 +143,11 @@ public class Main {
 		// misc construct & settings
 		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
+		JButton RegisterButton = new MenuButton("Register", null);
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
 		CredentialPanel.setLayout(fieldLayout);
+		ButtonPanel.setLayout(new FlowLayout(FlowLayout.CENTER));
 
 		// set Fonts
 		UsernameLabel.setFont(FIELD_FONT);
@@ -152,6 +155,7 @@ public class Main {
 		UsernameField.setFont(FIELD_FONT);
 		PasswordField.setFont(FIELD_FONT);
 		LoginButton.setFont(FIELD_FONT);
+		RegisterButton.setFont(FIELD_FONT);
 
 		// add to panels
 		UsernamePanel.add(UsernameLabel);
@@ -160,17 +164,18 @@ public class Main {
 		PasswordPanel.add(PasswordField);
 		CredentialPanel.add(UsernamePanel);
 		CredentialPanel.add(PasswordPanel);
-		LoginPanel.add(LoginButton);
+		ButtonPanel.add(LoginButton);
+		ButtonPanel.add(RegisterButton);
 
 		// setting backgrounds
 		UsernamePanel.setBackground(BG_COLOR);
 		PasswordPanel.setBackground(BG_COLOR);
-		LoginPanel.setBackground(BG_COLOR);
-
+		ButtonPanel.setBackground(BG_COLOR);
+		
 		// add to frame
 		frame.add(logoImgLabel, BorderLayout.NORTH);
 		frame.add(CredentialPanel, BorderLayout.CENTER);
-		frame.add(LoginPanel, BorderLayout.SOUTH);
+		frame.add(ButtonPanel, BorderLayout.SOUTH);
 
 		// center and show the window
 		frame.setLocationRelativeTo(null);
