@@ -57,7 +57,6 @@ public class GameHandler implements Runnable {
 		//TODO additional constraints to note:
 		//	nothing should have a : in its name
 		//  also shouldn't contain spaces
-		System.out.println(chatline);
 		String noTimeLine = chatline.substring(24);
 		String playerName = noTimeLine.split(":")[0];
 		boolean valid = this.isValidPlayer(playerName);
