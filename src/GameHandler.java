@@ -57,6 +57,7 @@ public class GameHandler implements Runnable {
 		//TODO additional constraints to note:
 		//	nothing should have a : in its name
 		//  also shouldn't contain spaces
+		System.out.println(chatline);
 		String noTimeLine = chatline.substring(24);
 		String playerName = noTimeLine.split(":")[0];
 		boolean valid = this.isValidPlayer(playerName);
@@ -74,6 +75,14 @@ public class GameHandler implements Runnable {
 			String ajb = ajbArr[ajbArr.length-1];
 			if (ajb.equals("but there was not enough in stock!")){
 				//Its a buy order restock reccomend message
+				Main.updateQueue.add(chatline);
+			}
+		}
+		else if (!valid && playerName.contains(" stopped by ")) {
+			String[] ajbArr = playerName.split(" stopped by ");
+			String ajb = ajbArr[ajbArr.length-1];
+			if (ajb.contains(" but there was nothing to buy.")){
+				//Its a message about why you have no stock
 				Main.updateQueue.add(chatline);
 			}
 		}

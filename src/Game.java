@@ -91,6 +91,11 @@ public class Game {
 								proc.getString(6) + " from " + 
 								proc.getString(7) + ", but there was not enough in stock!");
 				}
+				else if (returnVal == 2) {
+					this.chatlog.add(timeStamp + " " + 
+								proc.getString(4) + " stopped by " + 
+								proc.getString(7) + " but there was nothing to buy.");
+				}
 				else {
 					JOptionPane.showMessageDialog(null, "Player PlayerOrdersItem failed. Error code is: " + returnVal);
 				}
