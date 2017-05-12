@@ -257,7 +257,8 @@ public class Main {
 	public static ArrayList<String> getShopList() {
 		ArrayList<String> shopList = new ArrayList<>();
 		try {
-			CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList()}");
+			CallableStatement proc = Main.conn.prepareCall("{call dbo.getShopList(?)}");
+			proc.setString(1, MerchantID);
 			ResultSet rs = proc.executeQuery();
 			while (rs.next()) {
 				shopList.add(rs.getString(1));

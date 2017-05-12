@@ -32,7 +32,9 @@ public class Game {
 		//	the chance for offline players to go online increases as the total number of players
 		//	on the server is lower and decreases when it higher. the opposite applies to players going offline
 		//	also runs doPlayerInteraction for each player that is online
-		
+		if (Main.getShopList().isEmpty()) {
+			return;
+		}
 		List<Integer> playersList = this.getPlayerList();
 		int PlayerID;
 		for (int i = 0; i < playersList.size(); i++) {
