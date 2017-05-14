@@ -1,7 +1,5 @@
 import java.awt.BorderLayout;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.WindowAdapter;
@@ -19,6 +17,7 @@ import javax.swing.JTextField;
 import javax.swing.SwingConstants;
 import javax.swing.text.AbstractDocument;
 
+import org.apache.commons.validator.EmailValidator;
 import org.jasypt.util.password.StrongPasswordEncryptor;
 
 public class RegistrationPage implements GMMPage {
@@ -241,6 +240,19 @@ public class RegistrationPage implements GMMPage {
 			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "The email cannot be empty.");
 			return false;
 		}
+		// Checking that email is valid
+		if(!isValidEmail(emailID)) {
+			JOptionPane.showMessageDialog(centerPanel.getComponent(0), "Please enter a valid e-mail id.");
+			return false;
+		}
 		return true;
+	}
+
+	@SuppressWarnings("deprecation")
+	private boolean isValidEmail(String emailID) {
+		EmailValidator validator = EmailValidator.getInstance();
+		if(validator.isValid(emailID))
+			return true;
+		return false;
 	}
 }
