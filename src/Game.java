@@ -62,7 +62,7 @@ public class Game {
 //			popularity = proc.getDouble(1);
 //		}
 //		catch (SQLException exception) {exception.printStackTrace();}
-		if (Math.random() < 0.1) {//popularity) {
+		if (Math.random() < 0.5) {//popularity) {
 			try {
 				//call statement
 				CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.PlayerOrdersItem(?, ?, ?, ?, ?, ?) }");

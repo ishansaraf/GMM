@@ -128,7 +128,7 @@ public class GameHandler implements Runnable {
 
 	private void sendBuyOrder(String chatline) {
 		// TODO create stored proc for sending in buy orders
-		System.out.println(chatline);
+		//System.out.println(chatline);
 		String[] firstSplit = chatline.split(" just bought ");
 		String player = firstSplit[0];
 		String withoutPlayer = chatline.substring(player.length()+13);

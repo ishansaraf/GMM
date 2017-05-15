@@ -18,6 +18,7 @@ import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.DefaultListModel;
 import javax.swing.JButton;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
 import javax.swing.JOptionPane;
@@ -71,6 +72,8 @@ public class MarketPage implements GMMPage{
 	protected int numRestocksShown;
 	private MenuButton loadMoreOrdersButton;
 	private MenuButton loadMoreRestocksButton;
+	private MenuButton stats;
+	private JFrame statsFrame;
 	
 	public class RefreshListener implements ActionListener {
 
@@ -413,7 +416,7 @@ public class MarketPage implements GMMPage{
 			if (closed) {
 				shopName = "[CLOSED] " + shopName;
 			}
-			System.out.println(shopName);
+			//System.out.println(shopName);
 			this.shopListModel.addElement(shopName);
 		}
 		this.shopList.setModel(this.shopListModel);
