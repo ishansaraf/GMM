@@ -72,35 +72,9 @@ public class MarketPage implements GMMPage{
 	protected int numRestocksShown;
 	private MenuButton loadMoreOrdersButton;
 	private MenuButton loadMoreRestocksButton;
-	private MenuButton stats;
+	private JButton stats;
 	private JFrame statsFrame;
 	
-	public class RefreshListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			// refreshes current shop displayed
-			try {
-				refresh();
-			} catch (SQLException e1) {
-				JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
-			}	
-		}
-	}
-	
-	public class CloseListener implements ActionListener {
-
-		@Override
-		public void actionPerformed(ActionEvent e) {
-			try {
-				updateShop();
-			} catch (SQLException e1) {
-				JOptionPane.showMessageDialog(null, "Cannot update shop.");
-				e1.printStackTrace();
-			}
-		}
-		
-	}
 	
 	public MarketPage() {
 		this.atBottomOnUnshow = false;
@@ -115,7 +89,18 @@ public class MarketPage implements GMMPage{
 		this.eastPanel.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		this.eastPanel.setBorder(BorderFactory.createLineBorder(Color.black));
 		//panel with refresh button
-		this.refresh = new MenuButton("Refresh", new RefreshListener());
+		this.refresh = new MenuButton("Refresh", new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				// refreshes current shop displayed
+				try {
+					refresh();
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+				}	
+			}
+		});
 		this.refresh.setVisible(false);
 		JPanel topPanel = new JPanel();
 		displayPanel.add(topPanel);
@@ -223,11 +208,34 @@ public class MarketPage implements GMMPage{
 		displayPanel.add(restocksPanel);
 		
 		//close button
-		this.close = new MenuButton("", new CloseListener());
+		this.close = new MenuButton("", new ActionListener() {
+			
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				try {
+					updateShop();
+				} catch (SQLException e1) {
+					JOptionPane.showMessageDialog(null, "Cannot update shop.");
+					e1.printStackTrace();
+				}
+			}
+		});
 		this.close.setVisible(false);
 		JPanel botPanel = new JPanel();
 		displayPanel.add(botPanel);
 		botPanel.add(this.close);
+		
+		//stats button
+		this.stats = new MenuButton("View Stats", new ActionListener() {
+
+			@Override
+			public void actionPerformed(ActionEvent e) {
+				showStats();
+			}
+			
+		});
+		this.stats.setVisible(false);
+		botPanel.add(this.stats);
 		displayPanel.add(Box.createVerticalGlue());
 		
 		//set table properties
@@ -274,6 +282,7 @@ public class MarketPage implements GMMPage{
 		this.itemsTable.setFont(Main.TABLE_FONT);
 		this.refresh.setFont(Main.FIELD_FONT);
 		this.close.setFont(Main.FIELD_FONT);
+		this.stats.setFont(Main.FIELD_FONT);
 		
 		
 		//create the updateFeed Listbox for displaying updates
@@ -297,7 +306,24 @@ public class MarketPage implements GMMPage{
 		
 		ListSelectionModel lsm = this.shopList.getSelectionModel();
 		lsm.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-		lsm.addListSelectionListener(new ShopListListener());
+		lsm.addListSelectionListener(new ListSelectionListener() {
+			
+			@Override
+			public void valueChanged(ListSelectionEvent e) {
+				if (!e.getValueIsAdjusting()){
+					try {
+						if (shopList.getSelectedValue() != null) {
+							currShop = shopList.getSelectedValue();
+							MarketPage.this.numOrdersShown = 10;
+							MarketPage.this.numRestocksShown = 10;
+						}
+						refresh();
+					} catch (SQLException e1) {
+						JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
+					}
+				}
+			}
+		});
 		
 		this.shopList.setBackground(Main.BG_COLOR);
 		this.shopList.setForeground(Main.TEXT_COLOR);
@@ -395,6 +421,7 @@ public class MarketPage implements GMMPage{
 
 			this.refresh.setVisible(false);
 			this.close.setVisible(false);
+			this.stats.setVisible(false);
 			this.fundsLabel.setVisible(false);
 			if (this.atBottomOnUnshow) this.updateFeed.ensureIndexIsVisible(this.updateListModel.size()-1);
 			System.out.println("MarketPage Loaded");
@@ -473,6 +500,10 @@ public class MarketPage implements GMMPage{
 		this.populateShopList();
 		this.shopList.revalidate();
 		this.shopList.repaint();
+	}
+	
+	public void showStats() {
+		
 	}
 	
 	public void refresh() throws SQLException {
@@ -571,30 +602,12 @@ public class MarketPage implements GMMPage{
 			colModel.getColumn(3).setPreferredWidth(120);
 		}
 		this.close.setVisible(true);
+		this.stats.setVisible(true);
 		System.out.println("(re)loaded shop data!");
 //		this.test.setText(shopName + " " + count);
 //		count++;
 		
 	}
 	
-	class ShopListListener implements ListSelectionListener {
-
-		@Override
-		public void valueChanged(ListSelectionEvent e) {
-			if (!e.getValueIsAdjusting()){
-				try {
-					if (shopList.getSelectedValue() != null) {
-						currShop = shopList.getSelectedValue();
-						MarketPage.this.numOrdersShown = 10;
-						MarketPage.this.numRestocksShown = 10;
-					}
-					refresh();
-				} catch (SQLException e1) {
-					JOptionPane.showMessageDialog(null, "Sorry, cannot display page.");
-				}
-			}
-		}
-		
-	}
 	
 }
