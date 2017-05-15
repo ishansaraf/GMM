@@ -294,6 +294,8 @@ public class RestockPage implements GMMPage {
 			this.Supplier.setModel(new DefaultComboBoxModel<>(modelArray));
 			this.Supplier.setRenderer(new CSCListCellRenderer(Main.BG_COLOR2));
 		}
+		this.Shop.setSelectedIndex(0);
+		this.Supplier.setSelectedIndex(0);
 	}
 
 	@Override
