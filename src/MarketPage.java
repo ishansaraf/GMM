@@ -395,17 +395,17 @@ public class MarketPage implements GMMPage {
 		this.statsFrame = new JFrame(this.currShop + " Stats");
 		this.statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.statsFrame.setResizable(false);
-		
+
 		JScrollPane pane = new JScrollPane();
 		this.statsFrame.add(pane);
 		JPanel displayPanel = new JPanel();
 		pane.setViewportView(displayPanel);
 		pane.getViewport().setBackground(Main.BG_COLOR2);
 		pane.setVerticalScrollBarPolicy(ScrollPaneConstants.VERTICAL_SCROLLBAR_ALWAYS);
-		pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);		
+		pane.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_AS_NEEDED);
 		displayPanel.setLayout(new BoxLayout(displayPanel, BoxLayout.Y_AXIS));
 		displayPanel.setBackground(Main.BG_COLOR2);
-		
+
 		JPanel topPane = new JPanel();
 		JButton r = new MenuButton("Refresh", new ActionListener() {
 
@@ -417,22 +417,22 @@ public class MarketPage implements GMMPage {
 					e1.printStackTrace();
 				}
 			}
-			
+
 		});
 		r.setFont(Main.FIELD_FONT);
 		topPane.add(r);
 		topPane.setBackground(Main.BG_COLOR2);
 		displayPanel.add(topPane);
-		
+
 		this.statsTable = new JTable();
-		
+
 		if (setStatsModel(this.currShop) == 1) {
 			JOptionPane.showMessageDialog(null, "The shop selected could not be found. Please try refreshing.");
 			this.statsFrame.setVisible(false);
 			this.statsFrame.dispose();
 			return;
 		}
-		
+
 		this.statsTable.setBackground(Main.BG_COLOR2);
 		this.statsTable.setForeground(Main.TEXT_COLOR);
 		this.statsTable.setFont(Main.TABLE_FONT);
@@ -440,15 +440,15 @@ public class MarketPage implements GMMPage {
 		this.statsTable.setAutoResizeMode(JTable.AUTO_RESIZE_OFF);
 		this.statsTable.setShowHorizontalLines(false);
 		this.statsTable.setShowVerticalLines(false);
-		
+
 		JPanel tablePanel = new JPanel();
 		tablePanel.setBackground(Main.BG_COLOR2);
-		
+
 		JTableHeader header = statsTable.getTableHeader();
 		header.setBackground(Main.BG_COLOR2);
 		header.setForeground(Main.TEXT_COLOR);
 		header.setFont(Main.TABLE_FONT);
-		
+
 		JLabel shop = new JLabel(this.currShop + " Stats");
 		shop.setForeground(Main.TEXT_COLOR);
 		shop.setBackground(Main.BG_COLOR2);
@@ -459,19 +459,19 @@ public class MarketPage implements GMMPage {
 		tablePanel.add(statsTable);
 		displayPanel.add(tablePanel);
 		displayPanel.add(Box.createVerticalGlue());
-		
+
 		this.statsFrame.setVisible(true);
 		this.statsFrame.setSize(850, 400);
 	}
-	
+
 	private int setStatsModel(String shop) throws SQLException {
-		
+
 		CallableStatement cs = Main.conn.prepareCall("{? = call getShopStats(?, ?)}");
 		cs.registerOutParameter(1, Types.INTEGER);
 		cs.setString(2, shop);
 		cs.setString(3, Main.MerchantID);
 		ResultSet rs = cs.executeQuery();
-		String[] colNames = new String[] {"Item Name", "Qty. Sold", "Qty. Stocked", "Qty. Unfulfilled"};
+		String[] colNames = new String[] { "Item Name", "Qty. Sold", "Qty. Stocked", "Qty. Unfulfilled" };
 		ShopStatsTableModel model = new ShopStatsTableModel(rs, colNames);
 		this.statsTable.setModel(model);
 		TableColumnModel colModel = statsTable.getColumnModel();
@@ -482,6 +482,12 @@ public class MarketPage implements GMMPage {
 	public void search() {
 		String text = this.search.getText().trim().toLowerCase();
 		this.shopListModel = new DefaultListModel<>();
+
+		// Swapping to server based search if needed
+		if (text.contains("[") && text.contains("]")) {
+			serverSearch(text);
+		}
+
 		if (text.equals("") || text.equals("*")) {
 			for (String ShopID : Main.getShopList()) {
 				this.shopListModel.addElement(ShopID);
@@ -494,6 +500,23 @@ public class MarketPage implements GMMPage {
 			}
 		}
 		this.shopList.setModel(this.shopListModel);
+	}
+
+	public void serverSearch(String search) {
+		search = search.substring(1, search.length() - 1);
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call getShopByServer(?) }");
+			proc.registerOutParameter(1, Types.INTEGER);
+			proc.setString(2, search);
+			ResultSet rs = proc.executeQuery();
+
+			while (rs.next()) {
+				String shopName = rs.getString("Name");
+				this.shopListModel.addElement(shopName);
+			}
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
 	}
 
 	@Override
