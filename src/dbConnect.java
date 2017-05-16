@@ -31,7 +31,7 @@ public class dbConnect {
 			String serverURL = p.getProperty("server");
 			String username = p.getProperty("username");
 			String pwd = p.getProperty("password");
-			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd + ";databaseName=GMM";
+			String connectionURL = serverURL + ";user=" + username + ";password=" + pwd + ";databaseName=GMM;encrypt=true;trustServerCertificate=true";
 
 			conn = DriverManager.getConnection(connectionURL);
 			
