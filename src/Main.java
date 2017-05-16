@@ -75,7 +75,8 @@ public class Main {
 
 	public static void main(String[] args) throws SQLException {
 		relaunch = true;
-		register = false; //default to false: set to true to swap to register page
+		register = false; // default to false: set to true to swap to register
+							// page
 
 		dbConnect connector = new dbConnect();
 		conn = connector.connect();
@@ -112,13 +113,13 @@ public class Main {
 		frame.setResizable(false);
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-		//setUp registration page
+		// setUp registration page
 		JFrame regFrame = new JFrame("Register a GMM account");
 		regFrame.setSize(600, 360);
 		regFrame.setResizable(false);
 		regFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		RegistrationPage regPage = new RegistrationPage(regFrame);
-		
+
 		// load logo image
 		BufferedImage logoImg = null;
 		try {
@@ -152,7 +153,13 @@ public class Main {
 		// misc construct & settings
 		PasswordField.addKeyListener(new LoginListener(UsernameField, PasswordField));
 		JButton LoginButton = new MenuButton("Login", new LoginListener(UsernameField, PasswordField));
-		JButton RegisterButton = new MenuButton("Register", new RegisterListener());
+		JButton RegisterButton = new MenuButton("Register", new ActionListener() {
+			@Override
+			public void actionPerformed(ActionEvent arg0) {
+				Main.register = true;
+				Main.relaunch = false;
+			}
+		});
 		GridLayout fieldLayout = new GridLayout(2, 3);
 		PasswordField.setEchoChar('*');
 		CredentialPanel.setLayout(fieldLayout);
@@ -180,7 +187,7 @@ public class Main {
 		UsernamePanel.setBackground(BG_COLOR);
 		PasswordPanel.setBackground(BG_COLOR);
 		ButtonPanel.setBackground(BG_COLOR);
-		
+
 		// add to frame
 		frame.add(logoImgLabel, BorderLayout.NORTH);
 		frame.add(CredentialPanel, BorderLayout.CENTER);
@@ -323,7 +330,7 @@ public class Main {
 			ResultSet rs = cs.executeQuery();
 			while (rs.next()) {
 				list.add(rs.getString("Name") + " [" + rs.getDouble("Discount") + ", "
-							+ Math.floor(Math.sqrt(rs.getDouble("DistanceSq")) * 100) / 100 + "]");
+						+ Math.floor(Math.sqrt(rs.getDouble("DistanceSq")) * 100) / 100 + "]");
 			}
 			int status = cs.getInt(1);
 			if (status == 1) {
