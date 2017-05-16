@@ -505,9 +505,10 @@ public class MarketPage implements GMMPage {
 	public void serverSearch(String search) {
 		search = search.substring(1, search.length() - 1);
 		try {
-			CallableStatement proc = Main.conn.prepareCall("{ ? = call getShopByServer(?) }");
+			CallableStatement proc = Main.conn.prepareCall("{ ? = call getShopByServer(?, ?) }");
 			proc.registerOutParameter(1, Types.INTEGER);
 			proc.setString(2, search);
+			proc.setString(3, Main.MerchantID);
 			ResultSet rs = proc.executeQuery();
 
 			while (rs.next()) {
