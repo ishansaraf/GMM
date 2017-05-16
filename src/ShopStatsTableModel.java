@@ -17,7 +17,7 @@ public class ShopStatsTableModel extends AbstractTableModel{
 	private String[] columnNames;
 	private ArrayList<Stats> list = new ArrayList<>();
 	
-	public ShopStatsTableModel(ResultSet rs, String[] names, MarketPage page) throws SQLException {
+	public ShopStatsTableModel(ResultSet rs, String[] names) throws SQLException {
 		this.columnNames = names;
 		convert(rs);
 	}

@@ -113,7 +113,7 @@ public class Main {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
 		//setUp registration page
-		JFrame regFrame = new JFrame("Register an GMM account");
+		JFrame regFrame = new JFrame("Register a GMM account");
 		regFrame.setSize(600, 360);
 		regFrame.setResizable(false);
 		regFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
