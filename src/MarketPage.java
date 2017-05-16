@@ -392,7 +392,7 @@ public class MarketPage implements GMMPage {
 			this.statsFrame.setVisible(false);
 			this.statsFrame.dispose();
 		}
-		this.statsFrame = new JFrame(this.currShop + " Statistics");
+		this.statsFrame = new JFrame(this.currShop + " Stats");
 		this.statsFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		this.statsFrame.setResizable(false);
 		
@@ -412,7 +412,7 @@ public class MarketPage implements GMMPage {
 			@Override
 			public void actionPerformed(ActionEvent e) {
 				try {
-					setStatsModel(statsFrame.getTitle().replace(" Statistics", ""));
+					setStatsModel(statsFrame.getTitle().replace(" Stats", ""));
 				} catch (SQLException e1) {
 					e1.printStackTrace();
 				}
