@@ -1,8 +1,6 @@
 import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.List;
 
 import javax.swing.JOptionPane;
 
@@ -16,12 +14,10 @@ import javax.swing.JOptionPane;
  */
 public class GameHandler implements Runnable {
 
-	private String MerchantID;
 	private Game game;
 	private boolean shutDown;
 	
-	public GameHandler(String MerchantID) {
-		this.MerchantID = MerchantID;
+	public GameHandler() {
 		this.game = new Game();
 		this.shutDown = false;
 	}
@@ -49,14 +45,12 @@ public class GameHandler implements Runnable {
 		while(true) {
 			String chatline = this.game.nextChatLine();
 			if (chatline == null) break;
+			System.out.println(chatline);
 			this.parseChatLine(chatline);
 		}
 	}
 
 	private void parseChatLine(String chatline) {
-		//TODO additional constraints to note:
-		//	nothing should have a : in its name
-		//  also shouldn't contain spaces
 		String noTimeLine = chatline.substring(24);
 		String playerName = noTimeLine.split(":")[0];
 		boolean valid = this.isValidPlayer(playerName);
@@ -77,18 +71,9 @@ public class GameHandler implements Runnable {
 				Main.updateQueue.add(chatline);
 			}
 		}
-//		else if (!valid && playerName.contains(" stopped by ")) {
-//			String[] ajbArr = playerName.split(" stopped by ");
-//			String ajb = ajbArr[ajbArr.length-1];
-//			if (ajb.contains(" but there was nothing to buy.")){
-//				//Its a message about why you have no stock
-//				Main.updateQueue.add(chatline);
-//			}
-//		}
 	}
 
-	private boolean isValidPlayer(String playerName) {
-		// TODO create stored proc for checking if the playerName is valid
+	private static boolean isValidPlayer(String playerName) {
 		try {
 			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidPlayer(?)}");
 			proc.setString(2, playerName);
@@ -100,8 +85,7 @@ public class GameHandler implements Runnable {
 		return false;
 	}
 	
-	private boolean isValidItem(String itemName) {
-		// TODO create stored proc for checking if the itemName is valid
+	private static boolean isValidItem(String itemName) {
 		try {
 			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidItem(?)}");
 			proc.setString(2, itemName);
@@ -113,18 +97,17 @@ public class GameHandler implements Runnable {
 		return false;
 	}
 	
-	private boolean isValidShop(String shopName) {
-		// TODO create stored proc for checking if the shopName is valid
-		try {
-			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidShop(?)}");
-			proc.setString(2, shopName);
-			proc.registerOutParameter(1, Types.BOOLEAN);
-			proc.execute();
-			return proc.getBoolean(1);
-		}
-		catch (SQLException exception) {exception.printStackTrace();}
-		return false;
-	}
+//	private static boolean isValidShop(String shopName) {
+//		try {
+//			CallableStatement proc = Main.conn.prepareCall("{? = call dbo.isValidShop(?)}");
+//			proc.setString(2, shopName);
+//			proc.registerOutParameter(1, Types.BOOLEAN);
+//			proc.execute();
+//			return proc.getBoolean(1);
+//		}
+//		catch (SQLException exception) {exception.printStackTrace();}
+//		return false;
+//	}
 
 	private void sendBuyOrder(String chatline) {
 		// TODO create stored proc for sending in buy orders
@@ -179,67 +162,6 @@ public class GameHandler implements Runnable {
 			e.printStackTrace();
 		}
 	}
-
-//	/**
-//	 * runs doShopRestock for each shop belonging to the Merchant
-//	 *
-//	 */
-//	private void updateShops() {
-//		List<String> shopsList = Main.getShopList();
-//		for (int i = 0; i < shopsList.size(); i++) {
-////			doShopRestock(shopsList.get(i));
-//		}
-//	}
-	
-	/**
-	 * gets the list of players currently online on the server from the (simulated) Game
-	 *
-	 * @return
-	 */
-	private List<Integer> getPlayerList() {
-		return this.game.getPlayerList();
-	}
-	
-	/**
-	 * TODO gets list of all Servers (uses query)
-	 *
-	 * @return
-	 */
-	private List<String> getServerList() {
-		//DEBUG CODE START
-		List<String> dummyList = new ArrayList<>();
-		dummyList.add("Lesenburg");
-		dummyList.add("Icodracy");
-		dummyList.add("Mascronias");
-		dummyList.add("Delcromina");
-		return dummyList;
-		//DEBUG CODE END
-	}
-	
-//	/**
-//	 * TODO randomly decides whether or not the Storefront should restock with higher bias
-//	 * when Inventory is lower. If so, determines which items to stock by choosing with bias
-//	 * for Items bought recently that have a high AVG(Profit/TimeSpan). Also Biased toward Suppliers
-//	 *  that are closer to the Storefront and with higher discounts.
-//	 *   This is calculated using queries to the: 
-//	 *   	-StoreStocksItems Table for counting size of inventory
-//	 *   	-BuyOrder Table for items within a recent Datetime for the particular ShopID 
-//	 *   		counting the total UnitPrice*Quantity and finding the oldest order of said item to calculate the TimeSpan
-//	 *   	-Storefront Table to get the current Storefront's location
-//	 *   	-Supplier Table to get all the Suppliers within a certain distance to this Storefront sorted in order of 
-//	 *   		highest discount to lowest discount and then from closest to farthest.
-//	 *   	-Update the StockOrder Table with the new StockOrder
-//	 *   	-Update StoreStocksItems Table to fit with the data from the StockOrder.
-//	 *   	-Update Storefront Table to reflect the new funds
-//	 *
-//	 * @param ShopID
-//	 */
-//	private void doShopRestock(String ShopID) {
-//		//DEBUG CODE START
-//		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
-//		if (Math.random() < 0.05) Main.updateQueue.add(timeStamp + " Restocked the Shop: " + ShopID);
-//		//DEBUG CODE END
-//	}
 
 	public void shutDown() {
 		this.shutDown = true;

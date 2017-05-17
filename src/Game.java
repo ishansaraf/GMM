@@ -1,12 +1,17 @@
+import java.io.File;
+import java.io.FileNotFoundException;
 import java.sql.CallableStatement;
+import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Map;
 import java.util.Queue;
+import java.util.Scanner;
 
 import javax.swing.JOptionPane;
 
@@ -19,27 +24,36 @@ import javax.swing.JOptionPane;
  */
 public class Game {
 
+	private static final String DICTIONARY_LOCATION = "english.cleaned.all.10.txt";
 	private Queue<String> chatlog;
+	private ArrayList<Integer> playerList;
+	private Map<Boolean, ArrayList<Integer>> onOffMap;
+	private ArrayList<String> wordDict;
 	
 	public Game() {
 		this.chatlog = new LinkedList<>();
+		this.playerList = new ArrayList<>();
+		this.onOffMap = new HashMap<>();
+		this.wordDict = new ArrayList<>();
+		try {
+			Scanner scanner = new Scanner(new File(DICTIONARY_LOCATION));
+			while(scanner.hasNextLine()) {
+				String add = scanner.nextLine().trim();
+				if (add.contains("/")) continue;
+				this.wordDict.add(add);
+			}
+		} catch (FileNotFoundException exception) {
+			exception.printStackTrace();
+		}
 	}
 	
 	private void updatePlayers() {
-		//TODO randomly determines whether a player is online or offline.
-		//	a player that is online has a very low chance to go offline, and a player that is
-		//	offline as a relatively low chance to go online.
-		//	the chance for offline players to go online increases as the total number of players
-		//	on the server is lower and decreases when it higher. the opposite applies to players going offline
-		//	also runs doPlayerInteraction for each player that is online
 		if (Main.getShopList().isEmpty()) {
 			return;
 		}
-		List<Integer> playersList = this.getPlayerList();
-		int PlayerID;
-		for (int i = 0; i < playersList.size(); i++) {
-			PlayerID = playersList.get(i);
-			doPlayerInteraction(PlayerID);
+		updatePlayerList();
+		for (Integer playerID : this.onOffMap.get(true)) {
+			doPlayerInteraction(playerID);
 		}
 	}
 
@@ -54,15 +68,7 @@ public class Game {
 	 */
 	@SuppressWarnings("resource")
 	private void doPlayerInteraction(int PlayerID) {
-//		double popularity = 0;
-//		try {
-//			CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.getPopularity() }"); //TODO: implement
-//			proc.registerOutParameter(1, Types.DOUBLE);
-//			proc.execute();
-//			popularity = proc.getDouble(1);
-//		}
-//		catch (SQLException exception) {exception.printStackTrace();}
-		if (Math.random() < 0.3) {//popularity) {
+		if (Math.random() < 0.05) {
 			try {
 				//call statement
 				CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.PlayerOrdersItem(?, ?, ?, ?, ?, ?) }");
@@ -106,15 +112,29 @@ public class Game {
 		}
 	}
 
-	public List<Integer> getPlayerList() {
-		//TODO gets the list of players currently online on the server
-		//	does so by queriying the database for players on the current Server with Online = true
-		List<Integer> dummyList = new ArrayList<>();
-		dummyList.add(5);
-		dummyList.add(6);
-		dummyList.add(8);
-		dummyList.add(9);
-		return dummyList; //debug dummy return value
+	public void updatePlayerList() {
+		if (this.playerList.isEmpty()) {
+			try {
+				CallableStatement proc = Main.conn.prepareCall("{call dbo.getPlayerList()}");
+				ResultSet rs = proc.executeQuery();
+				while (rs.next()) {
+					this.playerList.add(rs.getInt("PlayerID"));
+				}
+			} catch (SQLException exception) {
+				exception.printStackTrace();
+			}
+		}
+		onOffMap.put(true, new ArrayList<>());
+		onOffMap.put(false, new ArrayList<>());
+		for (int player : this.playerList) {
+			double rand = Math.random();
+			if (rand < 0.5) {
+				onOffMap.get(true).add(player);
+			}
+			else {
+				onOffMap.get(false).add(player);
+			}
+		}
 	}
 	
 	public String nextChatLine() {
@@ -122,16 +142,36 @@ public class Game {
 	}
 	
 	public void update() {
-		//TODO updates the game (duh...)
 		updatePlayers();
 		junkifyChat();
 	}
 
 	private void junkifyChat() {
-		//TODO make/get a bunch of junky MMO chat messages, and add some edge cases
+		//make/get a bunch of junky MMO chat messages, and add some edge cases
 		// for testing the parser in GameHandler
 		String timeStamp = new SimpleDateFormat("<yyyy/MM/dd>[HH:mm:ss]:").format(new Date());
-		this.chatlog.add(timeStamp + " Hiro: I just bought this solomons bow from Eltear for sooo cheap!");
+		int randNumOfWords = (int) (Math.random()*10);
+		int randomPlayer = this.onOffMap.get(true).get( (int) (Math.random() * this.onOffMap.get(true).size()) );
+		if (randNumOfWords == 0) return;
+		StringBuilder chatLine = new StringBuilder();
+		chatLine.append(timeStamp);
+		chatLine.append(' ');
+		try {
+			CallableStatement proc = Main.conn.prepareCall("{call dbo.getPlayerNameByID(?)}");
+			proc.setInt(1, randomPlayer);
+			ResultSet rs = proc.executeQuery();
+			if (rs.next()) {
+				chatLine.append(rs.getString("UserName"));
+			}
+		} catch (SQLException exception) {
+			exception.printStackTrace();
+		}
+		chatLine.append(':');
+		for (int i = 0; i < randNumOfWords; i++) {
+			chatLine.append(' ');
+			chatLine.append(this.wordDict.get( (int)(Math.random()*this.wordDict.size()) ));
+		}
+		this.chatlog.add(chatLine.toString());
 	}
 	
 }

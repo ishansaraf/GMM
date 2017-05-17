@@ -578,7 +578,7 @@ public class MarketPage implements GMMPage {
 		this.dataUpdater.start();
 
 		// kick off a thread for collecting updates from the MMORPG
-		this.gameHandler = new GameHandler(Main.MerchantID);
+		this.gameHandler = new GameHandler();
 		this.gameThread = new Thread(this.gameHandler);
 		this.gameThread.start();
 	}

@@ -257,7 +257,7 @@ public class Main {
 	}
 
 	/**
-	 * TODO gets a list of shops owned by the Merchant using query
+	 * gets a list of shops owned by the Merchant using query
 	 *
 	 * @return List<String>
 	 */
