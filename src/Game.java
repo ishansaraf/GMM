@@ -180,7 +180,7 @@ public class Game {
 			proc.setInt(1, randomPlayer);
 			ResultSet rs = proc.executeQuery();
 			if (rs.next()) {
-				chatLine.append(rs.getString("UserName"));
+				chatLine.append(rs.getString("Username"));
 			}
 		} catch (SQLException exception) {
 			exception.printStackTrace();
