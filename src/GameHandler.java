@@ -149,8 +149,8 @@ public class GameHandler implements Runnable {
 			int returnVal = proc.getInt(1);
 
 			// Checking that buyOrder add was successful
-			// returnVal 5 means not enough quantity of item in store for buyorder
-			if (returnVal != 0) {
+			// returnVal 7 means not enough quantity of item in store for buyorder
+			if (returnVal != 0 && returnVal != 7) {
 				JOptionPane.showMessageDialog(null, 
 						"there was a problem registering a buy order in the database. Error code is: " + returnVal);
 				JOptionPane.showMessageDialog(null, "Player: " + player + 
