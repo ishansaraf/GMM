@@ -16,7 +16,8 @@ import javax.swing.JOptionPane;
  */
 public class GameHandler implements Runnable {
 
-	static final int INTERVAL_MS = 100;
+	static final int INTERVAL_MS_RANGE = 1500;
+	static final int INTERVAL_MS_MIN = 100;
 	private DefaultListModel<String> updateModel;
 	private JList<String> updateFeed;
 	private Game game;
@@ -32,19 +33,8 @@ public class GameHandler implements Runnable {
 	
 	@Override
 	public void run() {
-		int step = 0;
 		while(!this.shutDown) {
-			step++;
-			if (step > 5) {				
-				pollforUpdates();
-				step = 0;
-			}
-			try {
-				Thread.sleep(1000);
-			} catch (InterruptedException exception) {
-				// TODO Auto-generated catch-block stub.
-				exception.printStackTrace();
-			}
+			pollforUpdates();
 		}
 	}
 	/**
@@ -71,7 +61,7 @@ public class GameHandler implements Runnable {
 		}
 		Main.mainframe.repaint();
 		try {
-			Thread.sleep(INTERVAL_MS);
+			Thread.sleep( (int)(INTERVAL_MS_RANGE*Math.random() + INTERVAL_MS_MIN) );
 		} catch (InterruptedException exception) {
 			exception.printStackTrace();
 		}
