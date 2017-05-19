@@ -9,7 +9,7 @@ import javax.swing.JList;
  */
 public class Updater implements Runnable {
 	
-	static final int INTERVAL_MS = 200;
+	static final int INTERVAL_MS = 100;
 	private DefaultListModel<String> updateModel;
 	private JList<String> updateFeed;
 	private boolean shutDown;

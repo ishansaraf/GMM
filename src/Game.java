@@ -34,6 +34,8 @@ public class Game {
 		this.chatlog = new LinkedList<>();
 		this.playerList = new ArrayList<>();
 		this.onOffMap = new HashMap<>();
+		this.onOffMap.put(true, new ArrayList<>());
+		this.onOffMap.put(false, new ArrayList<>());
 		this.wordDict = new ArrayList<>();
 		try {
 			Scanner scanner = new Scanner(new File(DICTIONARY_LOCATION));
@@ -68,7 +70,7 @@ public class Game {
 	 */
 	@SuppressWarnings("resource")
 	private void doPlayerInteraction(int PlayerID) {
-		if (Math.random() < 0.05) {
+		if (Math.random() < 0.001) {
 			try {
 				//call statement
 				CallableStatement proc = Main.conn.prepareCall("{ ? = call dbo.PlayerOrdersItem(?, ?, ?, ?, ?, ?) }");
@@ -118,23 +120,38 @@ public class Game {
 				CallableStatement proc = Main.conn.prepareCall("{call dbo.getPlayerList()}");
 				ResultSet rs = proc.executeQuery();
 				while (rs.next()) {
-					this.playerList.add(rs.getInt("PlayerID"));
+					int toAdd = rs.getInt("PlayerID");
+					this.playerList.add(toAdd);
+					if (Math.random() > 0.5) {
+						this.onOffMap.get(true).add(toAdd);
+						System.out.println(toAdd);
+					}
+					else {
+						this.onOffMap.get(false).add(toAdd);
+					}
 				}
 			} catch (SQLException exception) {
 				exception.printStackTrace();
 			}
 		}
-		onOffMap.put(true, new ArrayList<>());
-		onOffMap.put(false, new ArrayList<>());
-		for (int player : this.playerList) {
-			double rand = Math.random();
-			if (rand < 0.5) {
-				onOffMap.get(true).add(player);
-			}
-			else {
-				onOffMap.get(false).add(player);
-			}
+		int player;
+		for (int i = 0; i < this.onOffMap.get(false).size()*0.01; i++) {
+			int r1 = (int) (Math.random()*this.onOffMap.get(true).size());
+			int r2 = (int) (Math.random()*this.onOffMap.get(false).size());
+			player = onOffMap.get(true).get(r1);
+			onOffMap.get(true).set(r1, onOffMap.get(false).get(r2));
+			onOffMap.get(false).set(r2, player);
 		}
+		
+//		for (int player : this.playerList) {
+//			double rand = Math.random();
+//			if (rand < 0.5) {
+//				onOffMap.get(true).add(player);
+//			}
+//			else {
+//				onOffMap.get(false).add(player);
+//			}
+//		}
 	}
 	
 	public String nextChatLine() {
@@ -143,7 +160,9 @@ public class Game {
 	
 	public void update() {
 		updatePlayers();
-		junkifyChat();
+		for (int i = 0; i < this.onOffMap.get(true).size()*0.0003; i++) {			
+			junkifyChat();
+		}
 	}
 
 	private void junkifyChat() {
