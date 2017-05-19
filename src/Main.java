@@ -15,9 +15,7 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
-import java.util.Queue;
 
 import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
@@ -60,7 +58,6 @@ public class Main {
 	public static final int WINDOW_SIZE_X = 1000;
 
 	static String MerchantID;
-	static Queue<String> updateQueue;
 	static List<String> serverList;
 	static List<String> supplierList;
 	static List<String> itemList;
@@ -216,8 +213,6 @@ public class Main {
 	}
 
 	static void runProgram() {
-		updateQueue = new LinkedList<>();
-
 		// construct menuBar
 		menuBar = new JPanel();
 		menuBar.setLayout(new GridLayout(0, 6));
@@ -283,7 +278,6 @@ public class Main {
 			Main.marketPage.shutDown();
 			Main.mainframe.dispose();
 			Main.MerchantID = null;
-			Main.updateQueue = null;
 			Main.menuBar = null;
 			Main.curPage = null;
 			Main.relaunch = true;

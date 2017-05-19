@@ -56,9 +56,7 @@ public class MarketPage implements GMMPage {
 	JTable ordersTable;
 	JTable itemsTable;
 	JScrollPane shopDisplayScroll;
-	Thread dataUpdater;
 	Thread gameThread;
-	private Updater updater;
 	private GameHandler gameHandler;
 	boolean atBottomOnUnshow;
 	int count = 0;
@@ -572,23 +570,16 @@ public class MarketPage implements GMMPage {
 	}
 
 	private void kickOffUpdateThreads() {
-		// kick off a thread for processing updates
-		this.updater = new Updater(this.updateListModel, this.updateFeed);
-		this.dataUpdater = new Thread(this.updater);
-		this.dataUpdater.start();
-
-		// kick off a thread for collecting updates from the MMORPG
-		this.gameHandler = new GameHandler();
+		// kick off a thread for collecting and processing updates from the MMORPG
+		this.gameHandler = new GameHandler(this.updateListModel, this.updateFeed);
 		this.gameThread = new Thread(this.gameHandler);
 		this.gameThread.start();
 	}
 
 	@Override
 	public void shutDown() {
-		this.updater.shutDown();
 		this.gameHandler.shutDown();
 		try {
-			this.dataUpdater.join();
 			this.gameThread.join();
 		} catch (InterruptedException exception) {
 			exception.printStackTrace();

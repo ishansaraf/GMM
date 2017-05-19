@@ -2,6 +2,8 @@ import java.sql.CallableStatement;
 import java.sql.SQLException;
 import java.sql.Types;
 
+import javax.swing.DefaultListModel;
+import javax.swing.JList;
 import javax.swing.JOptionPane;
 
 /**
@@ -14,20 +16,31 @@ import javax.swing.JOptionPane;
  */
 public class GameHandler implements Runnable {
 
+	static final int INTERVAL_MS = 100;
+	private DefaultListModel<String> updateModel;
+	private JList<String> updateFeed;
 	private Game game;
 	private boolean shutDown;
 	
-	public GameHandler() {
+	
+	public GameHandler(DefaultListModel<String> updateModel, JList<String> updateFeed) {
 		this.game = new Game();
+		this.updateModel = updateModel;
+		this.updateFeed = updateFeed;
 		this.shutDown = false;
 	}
 	
 	@Override
 	public void run() {
+		int step = 0;
 		while(!this.shutDown) {
-			pollforUpdates();
+			step++;
+			if (step > 5) {				
+				pollforUpdates();
+				step = 0;
+			}
 			try {
-				Thread.sleep(5000);
+				Thread.sleep(1000);
 			} catch (InterruptedException exception) {
 				// TODO Auto-generated catch-block stub.
 				exception.printStackTrace();
@@ -50,6 +63,20 @@ public class GameHandler implements Runnable {
 		}
 	}
 
+	private void addChatLine(String chatline) {
+		this.updateModel.addElement(chatline);
+		int curIndex = (this.updateModel.size()-1);
+		if (curIndex <= this.updateFeed.getLastVisibleIndex() + 1 && curIndex >= this.updateFeed.getFirstVisibleIndex()){
+			this.updateFeed.ensureIndexIsVisible(curIndex);
+		}
+		Main.mainframe.repaint();
+		try {
+			Thread.sleep(INTERVAL_MS);
+		} catch (InterruptedException exception) {
+			exception.printStackTrace();
+		}
+	}
+	
 	private void parseChatLine(String chatline) {
 		String noTimeLine = chatline.substring(24);
 		String playerName = noTimeLine.split(":")[0];
@@ -59,7 +86,7 @@ public class GameHandler implements Runnable {
 			if (ajb.contains(" from ") && ajb.charAt(ajb.length()-1) == '!'){
 				//Its a buy order
 				this.sendBuyOrder(noTimeLine);
-				Main.updateQueue.add(chatline);
+				this.addChatLine(chatline);
 			}
 		}
 		else if (!valid && playerName.contains(" wanted ")) {
@@ -68,7 +95,7 @@ public class GameHandler implements Runnable {
 			String ajb = ajbArr[ajbArr.length-1];
 			if (ajb.equals("but there was not enough in stock!")){
 				//Its a buy order restock reccomend message
-				Main.updateQueue.add(chatline);
+				this.addChatLine(chatline);
 			}
 		}
 	}
