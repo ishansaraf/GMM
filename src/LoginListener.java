@@ -69,7 +69,7 @@ public class LoginListener implements ActionListener, KeyListener{
 			if (!match) {
 				JOptionPane.showMessageDialog(null, "The username or password is invalid.");
 			} else {
-				proc = Main.conn.prepareCall("{call get_merchant_UID(?, ?)}");
+				proc = Main.conn.prepareCall("{call getMerchantUID(?, ?)}");
 				proc.setString(1, usernameField.getText());
 				proc.registerOutParameter(2, Types.NVARCHAR);
 				proc.execute();
